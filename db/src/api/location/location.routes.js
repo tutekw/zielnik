@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const queries = require('./location.queries');
+const authQueries = require('../auth/auth.queries');
 
 router.get('/:id', async (req, res) => {
     console.log(req.params.id);
@@ -10,12 +11,26 @@ router.get('/:id', async (req, res) => {
 });
 
 router.get('/', async (req,res) => {
-    const data = await queries.getAll();
+    const data = await queries.getPublic();
     res.json(data);
 });
 
 router.post('/', async (req,res) =>{
-    const location = await queries.findLocationByCoordinates(req.body.latitude, req.body.longtitude);
+    if(!req.headers.authorization) {
+        res.status(402).json({
+            message: 'To add new locations, you must first purchase a subscription'
+        });
+        return;
+    }
+    const user = await authQueries.getUserByToken(req.headers.authorization);
+    if(user.subscription_type != 1) {
+        res.status(402).json({
+            message: 'To add new locations, you must first purchase a subscription'
+        });
+        return;
+    }
+    
+    const location = await queries.getLocationByCoordinates(req.body.latitude, req.body.longtitude);
     if(location) {
         res.status(400).json({
             message: 'location already exists'
