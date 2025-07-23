@@ -72,7 +72,7 @@ router.post('/signin', async (req, res) => {
 	}
 	await db(tableNames.tokenList).insert(token);
 	res.status(201).json({
-		message: accessToken
+		message: token
 	})
 })
 

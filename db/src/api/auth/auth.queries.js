@@ -10,6 +10,10 @@ async function updateTokenExpirationDate(token){
 }
 async function getUserByToken(token) {
     const tokenData = await getTokenData(token.split(' ')[1]);
+    if(new Date(tokenData.expire_date) < new Date()) {
+        console.log("STARA DATA");
+        return undefined;
+    }
     const tokenUser = await userQueries.getUserById(tokenData.user);
     return tokenUser;
 }
