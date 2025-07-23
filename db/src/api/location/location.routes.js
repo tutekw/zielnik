@@ -11,7 +11,22 @@ router.get('/:id', async (req, res) => {
 });
 
 router.get('/', async (req,res) => {
-    const data = await queries.getPublic();
+    if(!req.headers.authorization) {
+        var data = await queries.getPublic();
+        res.json(data);
+        return;
+    }
+
+    const user = await authQueries.getUserByToken(req.headers.authorization);
+    if((!user) || (user.subscription_type != 1)) {
+        var data = await queries.getPublic();
+        res.json(data);
+        return;
+    }
+
+    const userId = user.id;
+    var data = await queries.get(userId);
+    console.log(data);
     res.json(data);
 });
 
@@ -22,8 +37,9 @@ router.post('/', async (req,res) =>{
         });
         return;
     }
+
     const user = await authQueries.getUserByToken(req.headers.authorization);
-    if(user.subscription_type != 1) {
+    if((!user) || (user.subscription_type != 1)) {
         res.status(402).json({
             message: 'To add new locations, you must first purchase a subscription'
         });

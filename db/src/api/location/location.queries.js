@@ -5,8 +5,12 @@ async function getOne(id){
 	const location = await db(tableNames.locationList).where({id: id}).first();
 	return location;
 }
-function getPublic() {
-	return db(tableNames.locationList).where({access: 0}); 
+async function getPublic() {
+	return await db(tableNames.locationList).where({access: 0}); 
+}
+async function get(userId) {
+	const data = await db(tableNames.locationList).where({access: 0}).orWhere({user_id: userId});
+	return data; 
 }
 async function getLocationByCoordinates(latitude, longtitude) {
 	const location = await db(tableNames.locationList)
@@ -27,4 +31,4 @@ async function createLocation(locationData) {
 	});
 }
 
-module.exports = { getOne, getPublic, getLocationByCoordinates, createLocation };
+module.exports = { getOne, getPublic, get, getLocationByCoordinates, createLocation };

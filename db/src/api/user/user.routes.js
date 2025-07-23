@@ -14,16 +14,9 @@ router.get('/:mail', async (req, res) => {
     }
 
     const user = await queries.getUserByMail(req.params.mail);
-    if(!user) {
-        res.status(400).json({
-            message: "invalid data"
-        });
-        return;
-    }
-
     const tokenUser = await authQueries.getUserByToken(token);
-    
-    if((tokenUser.mail != req.params.mail) || (!user)) {
+
+    if((!user) || (!tokenUser) || (tokenUser.mail != req.params.mail)) {
         res.status(400).json({
             message: "invalid data"
         });
