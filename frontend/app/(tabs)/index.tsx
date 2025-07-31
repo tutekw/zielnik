@@ -1,13 +1,14 @@
-import { Text, View,  StyleSheet } from 'react-native';
+import { Text, View, StyleSheet } from 'react-native';
 import { Link } from 'expo-router';
+import { colors } from '../styles';
 
 export default function Index() {
   return (
     <View style={styles.container} >
       <Text style={styles.text}>Home screen </Text>
-      <Link href="/map" style={styles.button}>
+      {/* <Link href="/map" style={styles.button}>
         Go to Map screen
-      </Link>
+      </Link> */}
     </View>
   );
 }
@@ -15,12 +16,12 @@ export default function Index() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#25292e',
+    backgroundColor: colors.bgColor,
     alignItems: 'center',
     justifyContent: 'center',
   },
   text: {
-    color: '#fff',
+    color: colors.textColor,
   },
   button: {
     fontSize: 20,
