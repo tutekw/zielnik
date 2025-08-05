@@ -1,13 +1,60 @@
 import { Button, PlatformPressable } from '@react-navigation/elements';
-import { View, Text, StyleSheet, Pressable} from 'react-native'
+import { View, Text, StyleSheet, Pressable, TouchableOpacity} from 'react-native'
 import { useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 export function UserPanel () {
     const router = useRouter();
 
+    useEffect(() => {
+        fetchData();
+    }, []);
+
+    const [loggedIn, setLoggedIn] = useState<boolean>();
+    const [expanded, setExpanded] = useState<boolean>(false);
+
+    const fetchData = async () => {
+        try {
+            if(!window.sessionStorage ){ 
+                setLoggedIn(false);
+                return;
+            }
+            const token = sessionStorage.getItem("token");
+            if(!token ){ 
+                setLoggedIn(false);
+                return;
+            }
+            const response = await axios.get("http://localhost:5050/api/user/", 
+            {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            (response.status == 200) ? setLoggedIn(true) : setLoggedIn(false); 
+        } catch (err) {
+            console.error("Error checking login status: ", err);
+        }
+    };
+
+    function toggleExpanded() {
+        setExpanded(!expanded);
+    }
+
     return (
         <PlatformPressable>
-            <Button style={styles.loginBtn} onPress={() => router.navigate('/login')}>Log in</Button>
+            {loggedIn ? (
+                <>
+                    <TouchableOpacity onPress={toggleExpanded}>
+                        <FontAwesome name={expanded ? 'user-circle-o' : 'user-circle'} size = {30}/>
+                    </TouchableOpacity>
+                {expanded && (
+                    <Text>DROPDOWN MENU</Text>
+                )}
+                </>
+            )
+            :
+                (<PlatformPressable style={styles.loginBtn} onPress={() => router.navigate('/login')}><Text style={styles.loginText}>Log in</Text></PlatformPressable>)
+            }
             
         </PlatformPressable>
     )
@@ -15,15 +62,19 @@ export function UserPanel () {
 
 const styles = StyleSheet.create({
     loginBtn: {
-        flex: 1,
-        flexDirection: 'row',
         justifyContent: 'center',
-        textAlign: 'center',
-        textAlignVertical: 'center',
         alignContent: 'center',
         width: 100,
-        height: 20,
-        borderRadius: 10
+        height: 40,
+        borderRadius: 10,
+        backgroundColor: '#22b005',
+    },
+    loginText: {
+    fontWeight: 'bold',
+        fontSize: 15,
+        color: '#fff',
+        textAlign: 'center',
+        textAlignVertical: 'center',
     }
 })
 

@@ -1,9 +1,9 @@
 import { Text, View, StyleSheet } from 'react-native';
 
-export default function Signup() {
+export default function Forgot() {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Signup screen</Text>
+      <Text style={styles.text}>Forgot password screen</Text>
     </View>
   );
 }

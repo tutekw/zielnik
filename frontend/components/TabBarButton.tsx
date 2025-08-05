@@ -55,14 +55,13 @@ const TabBarButton = ({onPress, onLongPress, isFocused, routeName, routeParams, 
 }
 
 const styles = StyleSheet.create({
-        tabBarElement: {
+    tabBarElement: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
         width: 80,
         height: 70,
         borderRadius: 20
-        
     },
     tabBarIcon: {
         display: "flex",
