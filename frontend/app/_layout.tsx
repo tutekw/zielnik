@@ -7,18 +7,22 @@ export default function RootLayout() {
   var vh = Dimensions.get('window').height;
 
   return (
-    <Stack screenOptions={{
+    <Stack
+    
+    screenOptions={{
         header: () => <Header/>,
         headerStyle: {
-        }
+        },
     }}>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 
-      <Stack.Screen name="user" />
+      <Stack.Screen name="profile" />
 
       <Stack.Screen name="login" />
 
       <Stack.Screen name="signup"/>
+
+      <Stack.Screen name="forgot"/>
     </Stack>
   );
 }

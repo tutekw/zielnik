@@ -1,6 +1,7 @@
 var colors = {
     bgColor: '#fff',
     textColor: '#000',
+    themeColor: '#22b005'
 }
 
 var tabBar = {

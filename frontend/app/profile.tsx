@@ -1,9 +1,9 @@
 import { Text, View, StyleSheet } from 'react-native';
 
-export default function User() {
+export default function Profile() {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>User screen</Text>
+      <Text style={styles.text}>Profile screen</Text>
     </View>
   );
 }

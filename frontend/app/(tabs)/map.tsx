@@ -13,7 +13,14 @@ export default function MapScreen() {
 
   const fetchData = async () => {
     try {
-      const token = sessionStorage.getItem("token");
+      var token;
+      if(!sessionStorage) {
+        token = undefined;
+      }
+      else {
+        token = sessionStorage.getItem("token");
+      }
+
       const response = await axios.get("http://localhost:5050/api/location/", 
       {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -21,13 +28,13 @@ export default function MapScreen() {
       setLocationData(response.data);
       console.log(response.data[0]?.name);
     } catch (err) {
-      console.error("Błąd podczas pobierania lokalizacji:", err);
+      console.error("Error during fetching locations: ", err);
     }
   };
 
   return  (
     <View style={styles.container}>
-      <Text style={styles.text}>{locations.length > 0? (JSON.stringify(locations)) : "Ładowanie..."}</Text>
+      <Text style={styles.text}>{locations.length > 0? (JSON.stringify(locations)) : "Loading..."}</Text>
     </View>
   );
 }
