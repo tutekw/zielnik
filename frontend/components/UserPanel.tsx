@@ -4,6 +4,14 @@ import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { BlurView } from 'expo-blur';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  Easing,
+  runOnJS,
+} from 'react-native-reanimated';
 
 export function UserPanel () {
     const router = useRouter();
@@ -13,7 +21,9 @@ export function UserPanel () {
     }, []);
 
     const [loggedIn, setLoggedIn] = useState<boolean>();
-    const [expanded, setExpanded] = useState<boolean>(false);
+    const [userMail, setUserMail] = useState<string>();
+    const expanded = useSharedValue(0); // 0 = zamknięte, 1 = otwarte
+    const [visible, setVisible] = useState(false);
 
     const fetchData = async () => {
         try {
@@ -30,25 +40,88 @@ export function UserPanel () {
             {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            (response.status == 200) ? setLoggedIn(true) : setLoggedIn(false); 
+            if(response.status == 200) {
+                setUserMail(response.data.mail)
+                setLoggedIn(true);
+                return;
+            }
+            setLoggedIn(false); 
         } catch (err) {
             console.error("Error checking login status: ", err);
         }
     };
 
-    function toggleExpanded() {
-        setExpanded(!expanded);
+    const toggleExpanded = () => {
+        if (expanded.value === 0) {
+            setVisible(true); // pokaż zanim zacznie animować
+            expanded.value = withTiming(1, { duration: 200, easing: Easing.out(Easing.ease) });
+        } else {
+            expanded.value = withTiming(0, { duration: 200, easing: Easing.out(Easing.ease) }, (finished) => {
+                if (finished) {
+                    runOnJS(setVisible)(false); // ukryj po animacji
+                }
+            });
+        }
+    };
+
+    const animatedMenuStyle = useAnimatedStyle(() => {
+        const opacity = expanded.value;
+        const translateY = expanded.value * 0 + (1 - expanded.value) * -20;
+        return {
+            opacity,
+            transform: [{ translateY }],
+        };
+    });
+
+
+    function logOut() {
+        (async () => {
+            console.log("LOGOUT");
+            try {
+                if(!loggedIn) {
+                    return
+                }
+                const token = sessionStorage.getItem("token");
+                await axios.put("http://localhost:5050/api/auth/signout", null,
+                {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setLoggedIn(false);
+                sessionStorage.removeItem("token");
+            } catch (err) {
+                console.error("Error during logout: ", err);
+            }
+        })();
     }
 
     return (
-        <PlatformPressable>
+        <View>
             {loggedIn ? (
                 <>
+                    
                     <TouchableOpacity onPress={toggleExpanded}>
-                        <FontAwesome name={expanded ? 'user-circle-o' : 'user-circle'} size = {30}/>
+                        
+                        <FontAwesome name={visible ? 'user-circle-o' : 'user-circle'} size = {30} color={visible? '#22b005' : '#000'}/>
                     </TouchableOpacity>
-                {expanded && (
-                    <Text>DROPDOWN MENU</Text>
+                {visible && (
+                    <>
+                        <Animated.View style={[styles.menu, animatedMenuStyle]}>
+                            <View style={styles.menuTitle}>
+                                <Text style={styles.userMail}>{userMail}</Text>
+                            </View>
+                            <TouchableOpacity style={[styles.menuItem, styles.menuItemFirst]}>
+                                <Text>Profile</Text>
+                                <FontAwesome style={styles.menuIcon} name="edit" color="black" />
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.menuItem}>
+                                <Text>Subscription</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={logOut} style={[styles.menuItem, styles.menuItemLast]}>
+                                <Text>Log out</Text>
+                                <FontAwesome style={styles.menuIcon} name="sign-out" color="black" />
+                            </TouchableOpacity>
+                        </Animated.View>
+                    </>
                 )}
                 </>
             )
@@ -56,7 +129,7 @@ export function UserPanel () {
                 (<PlatformPressable style={styles.loginBtn} onPress={() => router.navigate('/login')}><Text style={styles.loginText}>Log in</Text></PlatformPressable>)
             }
             
-        </PlatformPressable>
+        </View>
     )
 }
 
@@ -70,11 +143,67 @@ const styles = StyleSheet.create({
         backgroundColor: '#22b005',
     },
     loginText: {
-    fontWeight: 'bold',
+        fontWeight: 'bold',
         fontSize: 15,
         color: '#fff',
         textAlign: 'center',
         textAlignVertical: 'center',
+    },
+    menu: {
+        position: 'absolute',
+        top: 40,
+        width: 250,
+        height: 185,
+        right: 5,
+        borderWidth: 2,
+        borderRadius: 10,
+        borderColor: '#22b005',
+        padding: 10,
+        alignItems: 'center',
+        backgroundColor: '#fff'
+    },
+    menuTitle: {
+        marginTop: -10,
+        borderTopWidth: 0,
+        height: 60,
+        textAlignVertical: 'center',
+        justifyContent: 'center',
+        
+        
+    },
+    userMail: {
+        fontWeight: 'bold',
+        fontSize: 20,
+        wordWrap: 'break-word',
+        width: 250,
+        textAlign: 'center'
+    },
+    menuItem: {
+        height: 40,
+        width: 250,
+        padding: 10,
+        borderTopWidth: 2,
+        textAlignVertical: 'center',
+        justifyContent: 'center',
+        
+    },
+    menuItemFirst: {
+        
+    },
+    menuItemLast: {
+        borderTopWidth: 5,
+    },
+    menuIcon: {
+        position: 'absolute',
+        right: 5,
+        fontSize: 20,
+        top: 6
+    },
+    userIcon: {
+        position: 'absolute',
+        right: 5,
+        fontSize: 30,
+        top: 0
     }
 })
 

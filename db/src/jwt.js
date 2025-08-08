@@ -19,6 +19,9 @@ function checkPublicEndpoints(url){
     let accessibleRoutes = [
         '/api/auth/signup',
         '/api/auth/signin',
+        '/api/auth/activate',
+        '/api/auth/forgot',
+        '/api/auth/reset',
         '/api/location/'
     ]
     let isPublic = false;

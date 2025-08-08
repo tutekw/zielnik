@@ -26,7 +26,6 @@ router.get('/', async (req,res) => {
 
     const userId = user.id;
     var data = await queries.get(userId);
-    console.log(data);
     res.json(data);
 });
 
