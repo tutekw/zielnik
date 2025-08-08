@@ -21,6 +21,7 @@ exports.up = async (knex) => {
 		table.integer('phone_number');
 		stringTable(table, 'password').notNullable();
         table.integer('subscription_type'); //0- free, 1-paid
+		table.boolean('active').notNullable();
 	})
     await knex.schema.createTable(tableNames.locationList, (table)=> {
         table.increments().notNullable();
@@ -38,12 +39,20 @@ exports.up = async (knex) => {
 		table.increments().notNullable();
 		stringTable(table, 'token');
 		table.datetime('expire_date', {useTz: false}).notNullable();
-		references(table, tableNames.userList, 'user', true);
+		references(table, tableNames.userList, 'user_id', true);
+	})
+	await knex.schema.createTable(tableNames.codeList, (table) => {
+		table.increments().notNullable();
+		stringTable(table, 'code');
+		stringTable(table, 'type'); //confirm (email) | reset (password) 
+		references(table, tableNames.userList, 'user_id', true);
 	})
 };
 exports.down = async (knex) => {
 	await knex.schema.dropTableIfExists(tableNames.tokenList);
+	await knex.schema.dropTableIfExists(tableNames.codeList);
 	await knex.schema.dropTableIfExists(tableNames.locationList);
     await knex.schema.dropTableIfExists(tableNames.userList);
     await knex.schema.dropTableIfExists(tableNames.userAddressList);
+
 };

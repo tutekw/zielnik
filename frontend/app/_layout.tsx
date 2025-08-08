@@ -22,7 +22,15 @@ export default function RootLayout() {
 
       <Stack.Screen name="signup"/>
 
+      <Stack.Screen name="activate"/>
+
       <Stack.Screen name="forgot"/>
+
+      <Stack.Screen name="reset"/>
+      
+      <Stack.Screen name="tos"/>
+
+      <Stack.Screen name="privacy-policy"/>
     </Stack>
   );
 }

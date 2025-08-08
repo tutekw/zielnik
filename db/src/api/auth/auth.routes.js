@@ -12,6 +12,8 @@ const bcrypt = require('bcrypt');
 
 const db = require('../../../database');
 const tableNames = require('../../dictionary');
+
+
 require('dotenv').config();
 
 router.get('/', async (req, res) => {
@@ -39,6 +41,7 @@ router.post('/signup', async (req, res) => {
         await userQueries.createUser(req.body);
         var code = 201;
         var message = "User successfully created";
+		queries.generateCode(req.body.mail, "confirm");
     }
     res.status(code).json({ message: message });	
 });
@@ -51,6 +54,12 @@ router.post('/signin', async (req, res) => {
 		});
 		return;
 	}
+	if(!user.active) {
+		res.status(202).json({
+			message: 'please activate your account'
+		});
+		return;
+	} 
 
 	const passwordMatch = await bcrypt.compare(req.body.password, user.password);
 	if(!passwordMatch) {
@@ -68,7 +77,7 @@ router.post('/signin', async (req, res) => {
 	var token = {
 		token: jwt.sign(blankToken, process.env.JWT_PASS),
 		expire_date: expirationTime,
-		user: user.id
+		user_id: user.id
 	}
 	await db(tableNames.tokenList).insert(token);
 	res.status(201).json({
@@ -78,8 +87,64 @@ router.post('/signin', async (req, res) => {
 
 router.put('/signout', async (req, res) => {
     const token = req.headers.authorization.split(' ')[1];
-    await queries.updateTokenExpirationDate(token);
+    await queries.deleteToken(token);
     res.status(200).json({})
+});
+
+router.post('/forgot', async (req, res) => {
+	const user = await userQueries.getUserByMail(req.body.mail);
+	if(!user) {
+		res.status(400).json({
+			message: 'invalid email'
+		});
+		return;
+	}
+	await queries.deleteResetCodes(user.id);//disables and removes all previous reset codes from database
+	await queries.generateCode(req.body.mail, "reset");
+	res.status(200).json({})
+});
+
+router.post('/activate', async (req,res) => {
+	const codeData = await queries.getCodeData(req.body.code);
+	console.log(codeData);
+	if(!codeData || codeData.type != "confirm") {
+		res.status(400).json({
+			message: 'invalid code'
+		})
+		return;
+	}
+	const codeUser = await queries.getUserByCode(req.body.code);
+	if(!codeUser.active) {
+		console.log(codeUser);
+		await userQueries.activateUser(codeUser.id);
+		await queries.deleteCode(req.body.code);
+		return res.status(200).json({});
+	}
+	res.status(409).json({
+		message: 'user is already activated'
+	})
 })
+
+router.post('/reset', async (req,res) => {
+	const codeData = await queries.getCodeData(req.body.code);
+	console.log(codeData);
+	if(!codeData || codeData.type != "reset") {
+		res.status(400).json({
+			message: 'invalid code'
+		})
+		return;
+	}
+	const codeUser = await queries.getUserByCode(req.body.code);
+	if(!codeUser) {
+		return res.status(400).json({
+			message: 'user does not exist - invalid code'
+		})
+	}
+	await userQueries.changePassword(codeUser.id, req.body.password);
+	await queries.deleteCode(req.body.code);
+	return res.status(200).json({});
+
+})
+
 
 module.exports = router;
