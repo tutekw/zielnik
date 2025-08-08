@@ -3,7 +3,7 @@ import { Text, View, StyleSheet } from 'react-native';
 export default function Privacy() {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Reset password screen</Text>
+      <Text style={styles.text}>Privacy policy screen</Text>
     </View>
   );
 }
