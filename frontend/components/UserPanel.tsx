@@ -12,6 +12,8 @@ import Animated, {
   Easing,
   runOnJS,
 } from 'react-native-reanimated';
+import * as Updates from 'expo-updates';
+import { colors } from '@/app/styles';
 
 export function UserPanel () {
     const router = useRouter();
@@ -88,6 +90,8 @@ export function UserPanel () {
                 });
                 setLoggedIn(false);
                 sessionStorage.removeItem("token");
+
+                //await Updates.reloadAsync();
             } catch (err) {
                 console.error("Error during logout: ", err);
             }
@@ -109,7 +113,7 @@ export function UserPanel () {
                             <View style={styles.menuTitle}>
                                 <Text style={styles.userMail}>{userMail}</Text>
                             </View>
-                            <TouchableOpacity style={[styles.menuItem, styles.menuItemFirst]}>
+                            <TouchableOpacity onPress={() => router.navigate('/profile')} style={[styles.menuItem, styles.menuItemFirst]}>
                                 <Text>Profile</Text>
                                 <FontAwesome style={styles.menuIcon} name="edit" color="black" />
                             </TouchableOpacity>
@@ -140,7 +144,7 @@ const styles = StyleSheet.create({
         width: 100,
         height: 40,
         borderRadius: 10,
-        backgroundColor: '#22b005',
+        backgroundColor: colors.themeColor,
     },
     loginText: {
         fontWeight: 'bold',
@@ -157,7 +161,7 @@ const styles = StyleSheet.create({
         right: 5,
         borderWidth: 2,
         borderRadius: 10,
-        borderColor: '#22b005',
+        borderColor: colors.themeColor,
         padding: 10,
         alignItems: 'center',
         backgroundColor: '#fff'
@@ -168,8 +172,6 @@ const styles = StyleSheet.create({
         height: 60,
         textAlignVertical: 'center',
         justifyContent: 'center',
-        
-        
     },
     userMail: {
         fontWeight: 'bold',

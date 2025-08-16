@@ -5,6 +5,7 @@ import { PlatformPressable } from '@react-navigation/elements';
 import axios from 'axios';
 import HomeButton from '@/components/HomeButton';
 import { Link } from 'expo-router';
+import handleResponseError from './responseErrorHandler';
 
 export default function Reset() {
   const styles = authStyles;
@@ -52,28 +53,9 @@ export default function Reset() {
       }
       //Error messages
       catch (error :any) {
-        if(error.response) {
-          const status = error.response.status;
-          setErrorMessage(error.response.data.message);
-          if (status === 400) {
-          //setErrorMessage("Account with this e-mail doesn't exist.");
-          }
-          else if (status === 500) {
-          setErrorMessage('Server error. Please try again later.');
-          } 
-          else {
-          setErrorMessage(`Unexpected error (${status}).`);
-          }
-        }
-        else if (error.request) {
-            //Brak odpowiedzi z serwera
-            setErrorMessage('No response from server. Are you online?');
-        } 
-        else {
-            //Coś innego poszło nie tak
-            setErrorMessage('An unexpected error occurred.');
-        }
-        console.error('Login error:', error);
+        setVisible(false);
+        if(error.response.status === 400) setErrorMessage(error.response.data.message);
+        else setErrorMessage(handleResponseError(error));
       }
     })();
   }

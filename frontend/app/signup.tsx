@@ -6,6 +6,7 @@ import { useRef, useState } from 'react';
 import { Text, View, StyleSheet, TextInput, Alert } from 'react-native';
 import { authStyles} from './styles';
 import axios from 'axios';
+import handleResponseError from './responseErrorHandler';
 
 export default function Signup() {
 
@@ -53,29 +54,8 @@ export default function Signup() {
       //Error messages
       catch (error :any) {
         setVisible(false);
-        if(error.response) {
-          const status = error.response.status;
-
-          if (status === 400) {
-            setErrorMessage('An account with this e-mail already exists');
-          } 
-          else if (status === 500) {
-            setErrorMessage('Server error. Please try again later.');
-          } 
-          else {
-            setErrorMessage(`Unexpected error (${status}).`);
-          }
-        }
-        else if (error.request) {
-          //Brak odpowiedzi z serwera
-          setErrorMessage('No response from server. Are you online?');
-        } 
-        else {
-          //Coś innego poszło nie tak
-          setErrorMessage('An unexpected error occurred.');
-        }
-
-        console.error('Login error:', error);
+        if(error.response.status === 400) setErrorMessage('An account with this email already exists.');
+        else setErrorMessage(handleResponseError(error));
       }
     })();
   }

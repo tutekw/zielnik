@@ -13,14 +13,31 @@ const bcrypt = require('bcrypt');
 const db = require('../../../database');
 const tableNames = require('../../dictionary');
 
+const {rateLimit} = require('express-rate-limit')
 
 require('dotenv').config();
+
+const codeLimiter = rateLimit({
+    limit: 5,
+    windowMs: 15* 60* 1000,
+    standardHeaders: true,
+    legacyHeaders: false,
+    ipv6Subnet: 56
+})
+
+const authLimiter = rateLimit({
+    limit: 50,
+    windowMs: 15* 60* 1000,
+    standardHeaders: true,
+    legacyHeaders: false,
+    ipv6Subnet: 56
+})
 
 router.get('/', async (req, res) => {
     res.status(200); //check if auth service is connected
 });
 
-router.post('/signup', async (req, res) => {
+router.post('/signup', authLimiter, async (req, res) => {
     var constraints = {
         mail: is.email(),
         password: is.notBlank()
@@ -46,7 +63,7 @@ router.post('/signup', async (req, res) => {
     res.status(code).json({ message: message });	
 });
 
-router.post('/signin', async (req, res) => {
+router.post('/signin', authLimiter, async (req, res) => {
     const user = await userQueries.getUserByMail(req.body.mail);
 	if(!user) {
 		res.status(400).json({
@@ -91,7 +108,7 @@ router.put('/signout', async (req, res) => {
     res.status(200).json({})
 });
 
-router.post('/forgot', async (req, res) => {
+router.post('/forgot', codeLimiter, async (req, res) => {
 	const user = await userQueries.getUserByMail(req.body.mail);
 	if(!user) {
 		res.status(400).json({
@@ -104,7 +121,7 @@ router.post('/forgot', async (req, res) => {
 	res.status(200).json({})
 });
 
-router.post('/activate', async (req,res) => {
+router.post('/activate', codeLimiter, async (req,res) => {
 	const codeData = await queries.getCodeData(req.body.code);
 	console.log(codeData);
 	if(!codeData || codeData.type != "confirm") {
@@ -125,19 +142,19 @@ router.post('/activate', async (req,res) => {
 	})
 })
 
-router.post('/reset', async (req,res) => {
+router.post('/reset', codeLimiter, async (req,res) => {
 	const codeData = await queries.getCodeData(req.body.code);
 	console.log(codeData);
 	if(!codeData || codeData.type != "reset") {
 		res.status(400).json({
-			message: 'invalid code'
+			message: 'Invalid code'
 		})
 		return;
 	}
 	const codeUser = await queries.getUserByCode(req.body.code);
 	if(!codeUser) {
 		return res.status(400).json({
-			message: 'user does not exist - invalid code'
+			message: 'Account does not exist - invalid code'
 		})
 	}
 	await userQueries.changePassword(codeUser.id, req.body.password);

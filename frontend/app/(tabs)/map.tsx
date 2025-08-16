@@ -34,7 +34,7 @@ export default function MapScreen() {
 
   return  (
     <View style={styles.container}>
-      <Text style={styles.text}>{locations.length > 0? (JSON.stringify(locations)) : "Loading..."}</Text>
+      <Text style={styles.text}>{locations.length > 0 ? (JSON.stringify(locations)) : "Loading..."}</Text>
     </View>
   );
 }
