@@ -5,6 +5,8 @@ import { PlatformPressable } from '@react-navigation/elements';
 import { useState } from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import axios from 'axios';
+import handleResponseError from './responseErrorHandler';
+import HomeButton from '@/components/HomeButton';
 
 export default function Activate () {
 
@@ -37,31 +39,9 @@ export default function Activate () {
             }
             //Error messages
             catch (error :any) {
-                if(error.response) {
-                    const status = error.response.status;
-
-                    if (status === 400) {
-                    setErrorMessage('Invalid code.');
-                    }
-                    else if (status === 409) {
-                        setErrorMessage('This account is already activated')
-                    }
-                    else if (status === 500) {
-                    setErrorMessage('Server error. Please try again later.');
-                    } 
-                    else {
-                    setErrorMessage(`Unexpected error (${status}).`);
-                    }
-                }
-                else if (error.request) {
-                    //Brak odpowiedzi z serwera
-                    setErrorMessage('No response from server. Are you online?');
-                } 
-                else {
-                    //Coś innego poszło nie tak
-                    setErrorMessage('An unexpected error occurred.');
-                }
-                console.error('Login error:', error);
+                setVisible(false);
+                if(error.response.status === 400) setErrorMessage('Invalid code.');
+                else setErrorMessage(handleResponseError(error));
             }
         })();
     }
@@ -89,6 +69,7 @@ export default function Activate () {
                 <Text>Already have an account? <Link href="/login" style={styles.link}>Log in instead</Link></Text>
                 <Text>Don't have an account yet? <Link href="/signup" style={styles.link}>Create account</Link></Text>
             </View>
+            <HomeButton/>
         </View>
     );
 }

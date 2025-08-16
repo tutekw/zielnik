@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useRouter } from 'expo-router';
 import axios from 'axios';
 import { authStyles } from './styles';
+import handleResponseError from './responseErrorHandler';
 export default function Login() {
   
   const router = useRouter();
@@ -46,29 +47,8 @@ export default function Login() {
         }
         //Error messages
         catch (error :any) {
-          if(error.response) {
-            const status = error.response.status;
-
-            if (status === 400) {
-              setErrorMessage('Invalid email or password.');
-            } 
-            else if (status === 500) {
-              setErrorMessage('Server error. Please try again later.');
-            } 
-            else {
-              setErrorMessage(`Unexpected error (${status}).`);
-            }
-          }
-          else if (error.request) {
-            //Brak odpowiedzi z serwera
-            setErrorMessage('No response from server. Are you online?');
-          } 
-          else {
-            //Coś innego poszło nie tak
-            setErrorMessage('An unexpected error occurred.');
-          }
-
-          console.error('Login error:', error);
+          if(error.response.status === 400) setErrorMessage('Invalid email or password.');
+          else setErrorMessage(handleResponseError(error));
         }
       })();
     
@@ -109,6 +89,5 @@ export default function Login() {
       </View>
       <HomeButton/>
     </View>
-    //Dodaj że Signup i Forgot password, na stronach Forgot i Signup dodaj "Wróć do login" albo "Sign up instead", zeby ludzie na iPhone mogli nawigować
   );
 }

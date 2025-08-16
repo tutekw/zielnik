@@ -10,6 +10,12 @@ async function getUserById(id) {
 	const user = await db(tableNames.userList).where({id: id}).first();
 	return user;
 }
+
+async function getUserAddress(addressId) {
+	const address = await db(tableNames.userAddressList).where({id: addressId}).first();
+	return address;
+}
+
 async function createUser(user){
 	await db(tableNames.userList).insert({
 		mail: user.mail,
@@ -26,4 +32,6 @@ async function changePassword(id, password) {
 	await db(tableNames.userList).where({id: id}).update({password: encoder.encryptPassword(password)})
 }
 
-module.exports = { getUserByMail, getUserById, createUser, activateUser, changePassword };
+
+
+module.exports = { getUserByMail, getUserById, getUserAddress, createUser, activateUser, changePassword };

@@ -5,6 +5,8 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Link, useRouter } from 'expo-router';
 import { useState } from 'react';
 import axios from 'axios';
+import handleResponseError from './responseErrorHandler';
+import HomeButton from '@/components/HomeButton';
 
 export default function Forgot() {
 
@@ -36,28 +38,9 @@ export default function Forgot() {
             }
             //Error messages
             catch (error :any) {
-            if(error.response) {
-                const status = error.response.status;
-
-                if (status === 400) {
-                setErrorMessage("Account with this e-mail doesn't exist.");
-                }
-                else if (status === 500) {
-                setErrorMessage('Server error. Please try again later.');
-                } 
-                else {
-                setErrorMessage(`Unexpected error (${status}).`);
-                }
-            }
-            else if (error.request) {
-                //Brak odpowiedzi z serwera
-                setErrorMessage('No response from server. Are you online?');
-            } 
-            else {
-                //Coś innego poszło nie tak
-                setErrorMessage('An unexpected error occurred.');
-            }
-            console.error('Login error:', error);
+                setVisible(false);
+                if(error.response.status === 400) setErrorMessage('Account with this email does not exist.');
+                else setErrorMessage(handleResponseError(error));
             }
         })();
     }
@@ -84,6 +67,7 @@ export default function Forgot() {
                 <Text>Remember your password? <Link href="/login" style={styles.link}>Log in instead</Link></Text>
                 <Text>Don't have an account yet? <Link href="/signup" style={styles.link}>Create account</Link></Text>
             </View>
+            <HomeButton/>
         </View>
     );
 }

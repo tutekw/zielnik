@@ -21,11 +21,15 @@ router.get('/', async (req, res) => {
         return;
     }
 
+    const address = await queries.getUserAddress(tokenUser.address_id);
+
     res.status(200).json({
         name: tokenUser.name,
         surname: tokenUser.surname,
         mail: tokenUser.mail,
-        subscription_type: tokenUser.subscription_type
+        phone_number: tokenUser.phone_number,
+        subscription_type: tokenUser.subscription_type,
+        address: address
     });
 });
 
@@ -48,12 +52,15 @@ router.get('/:mail', async (req, res) => {
         return;
     }
 
+    const address = await queries.getUserAddress(user.address_id);
+
     res.json({
         name: user.name,
         surname: user.surname,
         mail: user.mail,
         phone_number: user.phone_number,
-        subscription_type: user.subscription_type
+        subscription_type: user.subscription_type,
+        address: address
     });
 });
 
