@@ -1,9 +1,11 @@
-export default function handleResponseError(error :any) {
-    console.error('Login error:', error);
+export default function handleResponseError(error :any, message400? :string) {
+    console.error('Error:', error);
     if(error.response) {
         const status = error.response.status;
-
-        if (status === 500) {
+        if(status === 400) {
+            return message400;
+        }
+        if(status === 500) {
             return('Server error. Please try again later.');
         } 
         else if(status === 429) {
@@ -13,7 +15,7 @@ export default function handleResponseError(error :any) {
             return(`Unexpected error (${status}).`);
         }
     }
-    else if (error.request) {
+    else if(error.request) {
         //Brak odpowiedzi z serwera
         return('No response from server. Are you online?');
     } 

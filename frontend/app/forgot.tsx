@@ -39,8 +39,7 @@ export default function Forgot() {
             //Error messages
             catch (error :any) {
                 setVisible(false);
-                if(error.response.status === 400) setErrorMessage('Account with this email does not exist.');
-                else setErrorMessage(handleResponseError(error));
+                setErrorMessage(handleResponseError(error, 'Account with this email does not exist.'));
             }
         })();
     }

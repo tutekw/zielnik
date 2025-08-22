@@ -27,6 +27,14 @@ export function UserPanel () {
     const expanded = useSharedValue(0); // 0 = zamknięte, 1 = otwarte
     const [visible, setVisible] = useState(false);
 
+    async function reload() {
+        if (__DEV__) {
+            window.location.reload();
+        } else {
+            await Updates.reloadAsync();
+        }
+    }
+
     const fetchData = async () => {
         try {
             if(!window.sessionStorage ){ 
@@ -91,7 +99,7 @@ export function UserPanel () {
                 setLoggedIn(false);
                 sessionStorage.removeItem("token");
 
-                //await Updates.reloadAsync();
+                await reload();
             } catch (err) {
                 console.error("Error during logout: ", err);
             }
@@ -119,6 +127,7 @@ export function UserPanel () {
                             </TouchableOpacity>
                             <TouchableOpacity style={styles.menuItem}>
                                 <Text>Subscription</Text>
+                                <FontAwesome style={styles.menuIcon} name="external-link" color="black" />
                             </TouchableOpacity>
                             <TouchableOpacity onPress={logOut} style={[styles.menuItem, styles.menuItemLast]}>
                                 <Text>Log out</Text>

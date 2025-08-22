@@ -47,8 +47,7 @@ export default function Login() {
         }
         //Error messages
         catch (error :any) {
-          if(error.response.status === 400) setErrorMessage('Invalid email or password.');
-          else setErrorMessage(handleResponseError(error));
+          setErrorMessage(handleResponseError(error, 'Invalid email or password.'));
         }
       })();
     
@@ -84,8 +83,10 @@ export default function Login() {
         </PlatformPressable>
       </View>
       <View style={styles.options}>
+        <Text>Your account is inactive? <Link href="/activate" style={styles.link}>Confirm account</Link></Text>
         <Text>Forgot your password? <Link href="/forgot" style={styles.link}>Reset password</Link></Text>
         <Text>Don't have an account yet? <Link href="/signup" style={styles.link}>Create account</Link></Text>
+        
       </View>
       <HomeButton/>
     </View>
