@@ -7,9 +7,7 @@ const authQueries = require('../auth/auth.queries');
 router.get('/', async (req, res) => {
     const token = req.headers.authorization;
     if(!token) {
-        res.status(400).json({
-            message: "Missing authorization token"
-        });
+        res.status(403);
         return;
     }
     const tokenUser = await authQueries.getUserByToken(token);
@@ -22,22 +20,24 @@ router.get('/', async (req, res) => {
     }
 
     const address = await queries.getUserAddress(tokenUser.address_id);
+    const subscription = await queries.getSubscriptionById(tokenUser.subscription_id);
 
     res.status(200).json({
         name: tokenUser.name,
         surname: tokenUser.surname,
         mail: tokenUser.mail,
+        phone_code: tokenUser.phone_code,
         phone_number: tokenUser.phone_number,
-        subscription_type: tokenUser.subscription_type,
-        address: address
+        address: address,
+        subscription: subscription
     });
 });
 
 router.get('/:mail', async (req, res) => {
     const token = req.headers.authorization;
     if(!token) {
-        res.status(400).json({
-            message: "invalid data"
+        res.status(401).json({
+            message: "Unauthorized"
         });
         return;
     }
@@ -53,15 +53,41 @@ router.get('/:mail', async (req, res) => {
     }
 
     const address = await queries.getUserAddress(user.address_id);
+    const subscription = await queries.getSubscriptionById(user.subscription_id);
 
     res.json({
         name: user.name,
         surname: user.surname,
         mail: user.mail,
+        phone_code: user.phone_code,
         phone_number: user.phone_number,
-        subscription_type: user.subscription_type,
-        address: address
+        address: address,
+        subscription: subscription
     });
+});
+
+router.post('/update', async (req, res) => {
+    const token = req.headers.authorization;
+    if(!token) {
+        res.status(401).json({
+            message: "Unauthorized"
+        });
+        return;
+    }
+
+    const tokenUser = await authQueries.getUserByToken(token);
+    if(!tokenUser) {
+        res.status(400).json({
+            message: "invalid data"
+        });
+        return;
+    }
+
+    await queries.updateUserData(tokenUser.id, req.body);
+    res.status(200).json({
+        message: 'Changes saved'
+    });
+    return;
 });
 
 module.exports = router;

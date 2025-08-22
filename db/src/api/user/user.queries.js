@@ -26,12 +26,29 @@ async function createUser(user){
 
 async function activateUser(id) {
     await db(tableNames.userList).where({id: id}).update({active: 1})
+	return;
 }
 
 async function changePassword(id, password) {
-	await db(tableNames.userList).where({id: id}).update({password: encoder.encryptPassword(password)})
+	await db(tableNames.userList).where({id: id}).update({password: encoder.encryptPassword(password)});
+	return;
+}
+
+async function getSubscriptionById(subId) {
+	const subscription = await db(tableNames.subscriptionList).where({id: subId}).first();
+	return subscription;
+}
+
+async function updateUserData(userId, data) {
+	await db(tableNames.userList).where({id: userId}).update({
+		name: data.name,
+		surname: data.surname,
+		phone_code: data.phone_code,
+		phone_number: data.phone_number
+	})
+	return;
 }
 
 
 
-module.exports = { getUserByMail, getUserById, getUserAddress, createUser, activateUser, changePassword };
+module.exports = { getUserByMail, getUserById, getUserAddress, createUser, activateUser, changePassword, getSubscriptionById, updateUserData };

@@ -54,7 +54,7 @@ export default function Reset() {
       //Error messages
       catch (error :any) {
         setVisible(false);
-        if(error.response.status === 400) setErrorMessage(error.response.data.message);
+        if(error.response && error.response.status === 400) setErrorMessage(error.response.data.message);
         else setErrorMessage(handleResponseError(error));
       }
     })();

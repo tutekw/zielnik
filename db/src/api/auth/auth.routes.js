@@ -49,7 +49,6 @@ router.post('/signup', authLimiter, async (req, res) => {
 
 
     const user = await userQueries.getUserByMail(req.body.mail);
-    console.log(user);
     if(user) {
         var code = 400;
         var message = "There is already an account with this e-mail"
@@ -123,7 +122,6 @@ router.post('/forgot', codeLimiter, async (req, res) => {
 
 router.post('/activate', codeLimiter, async (req,res) => {
 	const codeData = await queries.getCodeData(req.body.code);
-	console.log(codeData);
 	if(!codeData || codeData.type != "confirm") {
 		res.status(400).json({
 			message: 'invalid code'
@@ -132,7 +130,6 @@ router.post('/activate', codeLimiter, async (req,res) => {
 	}
 	const codeUser = await queries.getUserByCode(req.body.code);
 	if(!codeUser.active) {
-		console.log(codeUser);
 		await userQueries.activateUser(codeUser.id);
 		await queries.deleteCode(req.body.code);
 		return res.status(200).json({});
@@ -144,7 +141,6 @@ router.post('/activate', codeLimiter, async (req,res) => {
 
 router.post('/reset', codeLimiter, async (req,res) => {
 	const codeData = await queries.getCodeData(req.body.code);
-	console.log(codeData);
 	if(!codeData || codeData.type != "reset") {
 		res.status(400).json({
 			message: 'Invalid code'

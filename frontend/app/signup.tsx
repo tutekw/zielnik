@@ -54,8 +54,7 @@ export default function Signup() {
       //Error messages
       catch (error :any) {
         setVisible(false);
-        if(error.response.status === 400) setErrorMessage('An account with this email already exists.');
-        else setErrorMessage(handleResponseError(error));
+        setErrorMessage(handleResponseError(error, 'An account with this email already exists.'));
       }
     })();
   }

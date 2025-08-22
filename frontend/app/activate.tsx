@@ -40,8 +40,7 @@ export default function Activate () {
             //Error messages
             catch (error :any) {
                 setVisible(false);
-                if(error.response.status === 400) setErrorMessage('Invalid code.');
-                else setErrorMessage(handleResponseError(error));
+                setErrorMessage(handleResponseError(error, 'Invalid code.'));
             }
         })();
     }

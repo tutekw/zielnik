@@ -3,9 +3,9 @@ const router = express.Router();
 
 const queries = require('./location.queries');
 const authQueries = require('../auth/auth.queries');
+const userQueries = require('../user/user.queries');
 
 router.get('/:id', async (req, res) => {
-    console.log(req.params.id);
     const location = await queries.getOne(req.params.id);
     res.json(location);
 });
@@ -16,9 +16,14 @@ router.get('/', async (req,res) => {
         res.json(data);
         return;
     }
-
     const user = await authQueries.getUserByToken(req.headers.authorization);
-    if((!user) || (user.subscription_type != 1)) {
+    if((!user) || !(user.subscription_id )) {
+        var data = await queries.getPublic();
+        res.json(data);
+        return;
+    }
+    const userSubscription = await userQueries.getSubscriptionById(user.subscription_id);
+    if(userSubscription.subscription_type == 0) {
         var data = await queries.getPublic();
         res.json(data);
         return;
@@ -36,9 +41,15 @@ router.post('/', async (req,res) =>{
         });
         return;
     }
-
     const user = await authQueries.getUserByToken(req.headers.authorization);
-    if((!user) || (user.subscription_type != 1)) {
+    if((!user) || !(user.subscription_id )) {
+        res.status(402).json({
+            message: 'To add new locations, you must first purchase a subscription'
+        });
+        return;
+    }
+    const userSubscription = await userQueries.getSubscriptionById(user.subscription_id);
+    if(userSubscription.subscription_type == 0) {
         res.status(402).json({
             message: 'To add new locations, you must first purchase a subscription'
         });

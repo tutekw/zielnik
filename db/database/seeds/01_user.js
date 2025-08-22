@@ -3,11 +3,16 @@ const encoder = require('../../src/encoder');
 exports.seed = async function(knex) {
 //usuwa wszystko
   await knex(tableNames.userAddressList).del()
+  await knex(tableNames.subscriptionList).del()
   await knex(tableNames.userList).del()
+  
   await knex(tableNames.userAddressList).insert([
     {country: 'Poland', postcode: '44-000', city: 'Katowice', street: 'Rynek', street_number: '5', house_number: '2'}
   ]);
+  await knex(tableNames.subscriptionList).insert([
+    {subscription_type: 1}
+  ]);
 	await knex(tableNames.userList).insert([
-		{name: 'Henryk', surname: 'K', address_id: 1, mail: 'henryk@rmf.fm', phone_number: 48123456789, password: encoder.encryptPassword("123"), subscription_type: 1, active: true}
+		{name: 'Henryk', surname: 'K', address_id: 1, mail: 'henryk@rmf.fm', phone_code: 48, phone_number: 123456789, password: encoder.encryptPassword("123"), subscription_id: 1, active: true}
 	]);
 };
