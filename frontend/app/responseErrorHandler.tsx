@@ -1,9 +1,9 @@
-export default function handleResponseError(error :any, message400? :string) {
+export default function handleResponseError(error :any, message400? :string) :string {
     console.error('Error:', error);
     if(error.response) {
         const status = error.response.status;
         if(status === 400) {
-            return message400;
+            return message400 ? message400 : "Bad request";
         }
         if(status === 500) {
             return('Server error. Please try again later.');

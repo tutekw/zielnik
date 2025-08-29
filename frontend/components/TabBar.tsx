@@ -3,10 +3,7 @@ import { tabBar } from '../app/styles';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import TabBarButton from './TabBarButton';
 
-export function TabBar ({ state, descriptors, navigation } : BottomTabBarProps) {
-    
-
-    
+export default function TabBar ({ state, descriptors, navigation } : BottomTabBarProps) {
     return (
         <View style={styles.tabBar}>
             {state.routes.map((route, index) => {
@@ -22,26 +19,24 @@ export function TabBar ({ state, descriptors, navigation } : BottomTabBarProps) 
                 const isFocused = state.index === index;
 
                 const onPress = () => {
-                const event = navigation.emit({
-                    type: 'tabPress',
-                    target: route.key,
-                    canPreventDefault: true,
-                });
+                    const event = navigation.emit({
+                        type: 'tabPress',
+                        target: route.key,
+                        canPreventDefault: true,
+                    });
 
-                if (!isFocused && !event.defaultPrevented) {
-                    navigation.navigate(route.name, route.params);
-                }
+                    if (!isFocused && !event.defaultPrevented) {
+                        navigation.navigate(route.name, route.params);
+                    }
                 };
 
                 const onLongPress = () => {
-                navigation.emit({
-                    type: 'tabLongPress',
-                    target: route.key,
-                });
+                    navigation.emit({
+                        type: 'tabLongPress',
+                        target: route.key,
+                    });
                 };
                 
-                
-
                 return (
                     <TabBarButton 
                         key = {route.name}
@@ -52,9 +47,7 @@ export function TabBar ({ state, descriptors, navigation } : BottomTabBarProps) 
                         routeParams = {route.params}
                         color= {isFocused ? tabBar.selectedColor : tabBar.textColor}
                         label={label}
-                        >
-
-                        </TabBarButton>
+                    ></TabBarButton>
                 );
             })}
         </View>
@@ -79,5 +72,3 @@ const styles = StyleSheet.create({
         borderColor: '#22b005'
     }
 })
-
-export default TabBar;

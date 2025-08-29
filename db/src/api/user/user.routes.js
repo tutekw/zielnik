@@ -7,16 +7,17 @@ const authQueries = require('../auth/auth.queries');
 router.get('/', async (req, res) => {
     const token = req.headers.authorization;
     if(!token) {
-        res.status(403);
+        res.status(401).json({
+            message: "Unauthorized"
+        });
         return;
     }
     const tokenUser = await authQueries.getUserByToken(token);
 
     if(!tokenUser) {
-        res.status(400).json({
+        return res.status(400).json({
             message: "Invalid token"
         });
-        return;
     }
 
     const address = await queries.getUserAddress(tokenUser.address_id);
