@@ -22,7 +22,7 @@ function checkPublicEndpoints(url){
         '/api/auth/activate',
         '/api/auth/forgot',
         '/api/auth/reset',
-        '/api/location/'
+        '/api/location/',
     ]
     let isPublic = false;
     accessibleRoutes.forEach((element) => {
@@ -45,6 +45,10 @@ function authenticateJWT(req, res, next){
                 return res.sendStatus(403);
             }
             req.user = user;
+            if(user.remember_me) {
+                next();
+                return;
+            }
             if(new Date(user.expire_date) > new Date()){
                 next();
                 return;

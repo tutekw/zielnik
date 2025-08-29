@@ -44,7 +44,8 @@ exports.up = async (knex) => {
 	await knex.schema.createTable(tableNames.tokenList, (table) => {
 		table.increments().notNullable();
 		stringTable(table, 'token');
-		table.datetime('expire_date', {useTz: false}).notNullable();
+		table.datetime('expire_date', {useTz: false});
+		table.boolean('remember_me').notNullable();
 		references(table, tableNames.userList, 'user_id', true);
 	})
 	await knex.schema.createTable(tableNames.codeList, (table) => {

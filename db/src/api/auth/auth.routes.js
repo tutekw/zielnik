@@ -84,18 +84,26 @@ router.post('/signin', authLimiter, async (req, res) => {
 		})
 		return;
 	}
-
-	var expirationTime = queries.addHours(1);
+	if(!req.body.remember_me) {
+		var expireDate = queries.addHours(1);
+		var rememberMe = false;
+	}
+	else {
+		var expireDate = null; //never, token always active
+		var rememberMe = true;
+	}
 	var blankToken = {
 		mail: req.body.mail,
-		expire_date: expirationTime
+		expire_date: expireDate,
+		remember_me: rememberMe
 	}
 	var token = {
 		token: jwt.sign(blankToken, process.env.JWT_PASS),
-		expire_date: expirationTime,
+		expire_date: expireDate,
+		remember_me: rememberMe,
 		user_id: user.id
 	}
-	await db(tableNames.tokenList).insert(token);
+	await queries.addToken(token);
 	res.status(201).json({
 		message: token
 	})
@@ -156,7 +164,19 @@ router.post('/reset', codeLimiter, async (req,res) => {
 	await userQueries.changePassword(codeUser.id, req.body.password);
 	await queries.deleteCode(req.body.code);
 	return res.status(200).json({});
+})
 
+router.post('/token', async (req,res) => {
+	// const tokenValid = await queries.checkTokenValidity(req.headers.authorization);
+	// if(tokenValid) {
+	// 	return res.status(200).json({});
+	// }
+	// return res.status(400).json({
+	// 	message: 'invalid token'
+	// });
+
+	//jeżeli ŕequest tutaj dotarł , to znaczy że przeszedł przez autentykację JWT -> token działa
+	return res.status(200).json({});
 })
 
 

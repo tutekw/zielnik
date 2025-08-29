@@ -99,6 +99,7 @@ export default function Signup() {
         </PlatformPressable>
       </View>
       <View style={styles.options}>
+        <Text>Your account is inactive? <Link href="/activate" style={styles.link}>Confirm account</Link></Text>
         <Text>Forgot your password? <Link href="/forgot" style={styles.link}>Reset password</Link></Text>
         <Text>Already have an account? <Link href="/login" style={styles.link}>Log in instead</Link></Text>
       </View>

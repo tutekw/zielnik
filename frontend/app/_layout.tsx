@@ -18,6 +18,8 @@ export default function RootLayout() {
 
       <Stack.Screen name="profile" />
 
+      <Stack.Screen name="subscription"/>
+
       <Stack.Screen name="login" />
 
       <Stack.Screen name="signup"/>

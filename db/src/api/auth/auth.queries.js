@@ -3,8 +3,21 @@ const tableNames = require('../../dictionary');
 const userQueries = require('../user/user.queries');
 const nodemailer = require('nodemailer'); 
 
+async function addToken(token) {
+    await db(tableNames.tokenList).insert(token);
+}
 async function getTokenData(token){
     return await db(tableNames.tokenList).where({token: token}).first();
+}
+async function checkTokenValidity(token) {
+    const tokenData = await getTokenData(token.split(' ')[1]);
+    if(!tokenData) return false;
+    if(tokenData.remember_me) return true;
+    if(new Date(tokenData.expire_date) < new Date()) {
+        await deleteToken(token);
+        return false;
+    }
+    return true;
 }
 async function updateTokenExpirationDate(token){
 	await db(tableNames.tokenList).where({token: token}).update({expire_date: new Date()})
@@ -14,12 +27,16 @@ async function deleteToken(token) {
 }
 async function getUserByToken(token) {
     const tokenData = await getTokenData(token.split(' ')[1]);
-    if(new Date(tokenData.expire_date) < new Date()) {
-        await deleteToken(token);
-        return undefined;
+    if(!tokenData) return undefined;
+    if(tokenData.remember_me) {
+        return await userQueries.getUserById(tokenData.user_id);
     }
-    const tokenUser = await userQueries.getUserById(tokenData.user_id);
-    return tokenUser;
+    if(new Date(tokenData.expire_date) > new Date()) {
+        return await userQueries.getUserById(tokenData.user_id);
+    }
+    await deleteToken(token.split(' ')[1]);
+    return undefined;
+    
 }
 async function getCodeData(code){
     const codeData = await db(tableNames.codeList).where({code: code}).first();
@@ -59,7 +76,7 @@ async function generateCode(userMail, codeType) {
     //     service: 'gmail',
     //     auth: {
     //         user: 'da.zielnik@gmail.com',
-    //         pass: 'RT2-i.h8DB2ctJu'
+    //         pass: ''
     //     }
     //     });
 
@@ -78,4 +95,4 @@ async function generateCode(userMail, codeType) {
     //     }
     // }); 
 }
-module.exports = { getTokenData, getUserByToken, deleteToken, getCodeData, getUserByCode, deleteCode, deleteResetCodes, updateTokenExpirationDate, addHours, generateCode }
+module.exports = { addToken, getTokenData, checkTokenValidity, getUserByToken, deleteToken, getCodeData, getUserByCode, deleteCode, deleteResetCodes, updateTokenExpirationDate, addHours, generateCode }

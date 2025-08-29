@@ -14,7 +14,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import * as Updates from 'expo-updates';
 import { colors } from '@/app/styles';
-
+import storage from '../app/storage';
+import dataHandler from '@/app/dataHandler';
 export function UserPanel () {
     const router = useRouter();
 
@@ -22,7 +23,7 @@ export function UserPanel () {
         fetchData();
     }, []);
 
-    const [loggedIn, setLoggedIn] = useState<boolean>();
+    const [loggedIn, setLoggedIn] = useState<boolean>(false);
     const [userMail, setUserMail] = useState<string>();
     const expanded = useSharedValue(0); // 0 = zamknięte, 1 = otwarte
     const [visible, setVisible] = useState(false);
@@ -37,21 +38,9 @@ export function UserPanel () {
 
     const fetchData = async () => {
         try {
-            if(!window.sessionStorage ){ 
-                setLoggedIn(false);
-                return;
-            }
-            const token = sessionStorage.getItem("token");
-            if(!token ){ 
-                setLoggedIn(false);
-                return;
-            }
-            const response = await axios.get("http://localhost:5050/api/user/", 
-            {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            if(response.status == 200) {
-                setUserMail(response.data.mail)
+            const user = await dataHandler.getUser();
+            if(user) {
+                setUserMail(user.mail)
                 setLoggedIn(true);
                 return;
             }
@@ -91,15 +80,17 @@ export function UserPanel () {
                 if(!loggedIn) {
                     return
                 }
-                const token = sessionStorage.getItem("token");
+                const token = await storage.getValue("token");
                 await axios.put("http://localhost:5050/api/auth/signout", null,
                 {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setLoggedIn(false);
-                sessionStorage.removeItem("token");
-
+                await storage.remove("user");
+                await storage.setObject("logged_in", false);
+                await storage.remove("token");
                 await reload();
+
             } catch (err) {
                 console.error("Error during logout: ", err);
             }
@@ -125,7 +116,7 @@ export function UserPanel () {
                                 <Text>Profile</Text>
                                 <FontAwesome style={styles.menuIcon} name="edit" color="black" />
                             </TouchableOpacity>
-                            <TouchableOpacity style={styles.menuItem}>
+                            <TouchableOpacity onPress={() => router.navigate('/subscription')} style={styles.menuItem}>
                                 <Text>Subscription</Text>
                                 <FontAwesome style={styles.menuIcon} name="external-link" color="black" />
                             </TouchableOpacity>

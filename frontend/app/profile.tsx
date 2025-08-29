@@ -3,12 +3,14 @@ import { Text, View, StyleSheet, TextInput, Button, Pressable, Platform, TextBas
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import HomeButton from '@/components/HomeButton';
 import { useEffect, useRef, useState } from 'react';
-import { Link, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import axios from 'axios';
 import { authStyles, colors  } from './styles';
 import handleResponseError from './responseErrorHandler';
 import { LinearGradient } from 'expo-linear-gradient';
-
+import storage from './storage';
+import dataHandler from './dataHandler';
+import SubscriptionDisplay from '@/components/SubscriptionDisplay';
 
 export default function Profile() {
   
@@ -52,61 +54,12 @@ export default function Profile() {
 
     const fetchData = async () => {
         try {
-            if(!window.sessionStorage ){ 
-                setLoading(false);
-                return;
-            }
-            const token = sessionStorage.getItem("token");
-            if(!token ){ 
-                setLoading(false);
-                return;
-            }
-            const response = await axios.get("http://localhost:5050/api/user/", 
-            {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            if(response.status == 200) {
-                const user = {
-                    ...response.data,
-                    address: response.data.address ?? {}
-                };
-                console.log(response.data)
-                setUser(user);
-                return;
-            }
+            const user = await dataHandler.getUser();
+            if(user) setUser(user);
         } catch (err) {
             console.error("Error getting user data: ", err);
         } finally {
             setLoading(false);
-        }
-    };
-
-    // const formatPhone = (phone: any) => {
-    //     if (!phone) return "";
-    //     const str = String(phone);
-    //     return str.slice(0, 2) + " " + str.slice(2);
-    // };
-
-    const formatSubscription = (sub: any) => {
-        if (!sub || sub.subscription_type == 0) {
-            return (
-                <View style={styles.subscription}>
-                    <Text style={{textAlign: 'center', fontSize: 18}}>Free subscription</Text>
-                </View>
-            );
-        }
-        else if(sub.subscription_type == 1) {
-            return (
-                <LinearGradient
-                    colors={['#39d5b8', '#22b005']}
-                    start={{x: 0.85, y: 0.85}}
-                    end={{x: 0.15, y: 0.15}}
-                    style={styles.subscription}
-                >
-                    <Text style={{textAlign: 'center', fontWeight: 'bold', color: '#fff', fontSize: 18, marginBottom: 10}}>Premium subscription</Text> {/* fajne efekty, pogrubienie, jakis gradient */}
-                    <Text style={{textAlign: 'right', color: '#fff'}}>Expires in: {sub.expire_date ? sub.expire_date : 'Lifetime!'}</Text>
-                </LinearGradient>
-            )
         }
     };
 
@@ -122,15 +75,12 @@ export default function Profile() {
 
     function save(e :any) {
         e.preventDefault();
-        if(!window.sessionStorage ) { 
-            return;
-        }
-        const token = sessionStorage.getItem("token");
-        if(!token ) { 
-            return;
-        }
-        // const number = ((formData.phone_code).concat(formData.phone_number)).replace(/\s+/g, '');
         (async ()=>{
+            const token = await storage.getValue("token");
+            if(!token ) { 
+                return;
+            }
+
             try {
                 const response = await axios.post('http://localhost:5050/api/user/update', {
                     name: formData.name,
@@ -143,6 +93,7 @@ export default function Profile() {
                 });
                 if (response.status == 200) {
                     setLoading(true);
+                    await storage.remove("user");
                     setEdit(false);
                     await fetchData();
                     setMessageVisible(true);
@@ -155,9 +106,7 @@ export default function Profile() {
                 else setErrorMessage(handleResponseError(error));
             }
         })();
-
     }
-
     if (loading) {
         return (
             <View style={authStyles.container}>
@@ -165,21 +114,22 @@ export default function Profile() {
             </View>
         );
     }
-
     if (!user) {
-        router.replace("/login");
-        return null;
+        return router.replace("/login");;
     }
-
     return (
         <View style={authStyles.container}>
             <Text style={authStyles.title}>User profile</Text>
             <Text style={authStyles.subtitle}>{user.mail}</Text>
 
-            {!editing && formatSubscription(user.subscription)}
+            {!editing && 
+                <TouchableOpacity onPress={()=> router.navigate('/subscription')}>
+                    <SubscriptionDisplay sub={user.subscription} />
+                </TouchableOpacity>
+            }
             {editing && <Text style={[authStyles.title, {textAlign: 'left', marginBottom: 10}]}>Editing</Text>}
+
             <View style={styles.dataContainer}>
-                
                 <View style={[styles.row, styles.rowFirst]}>
                     <View style={styles.dataName}>
                         <Text>First name:</Text>
@@ -194,14 +144,13 @@ export default function Profile() {
                         id='name'
                         returnKeyType="next"
                         placeholder='Name'
-                        ></TextInput>)
-                    : (
+                        ></TextInput>
+                    ): (
                         <View style={[styles.data, styles.dataFirst]}>
                             <Text>{user.name}</Text>
-                        </View>)
-                    }
+                        </View>
+                    )}
                 </View>
-
                 <View style={styles.row}>
                     <View style={styles.dataName}>
                         <Text>Last name:</Text>
@@ -217,15 +166,12 @@ export default function Profile() {
                         returnKeyType="next"
                         placeholder='Surname'
                         ></TextInput>
-                    )
-                    : (
+                    ): (
                         <View style={styles.data}>
                             <Text>{user.surname}</Text>
                         </View>
-                    )
-                    }
+                    )}
                 </View>
-
                 <View style={styles.row}>
                     <View style={styles.dataName}>
                         <Text>Phone number:</Text>
@@ -239,13 +185,11 @@ export default function Profile() {
                                 value={formData.phone_code}
                                 ref={codeRef} 
                                 onChangeText={(text) => handleChange('phone_code', text)} 
-                                onSubmitEditing={() => codeRef.current?.focus()} 
+                                onSubmitEditing={() => phoneRef.current?.focus()} 
                                 id='phone_code'
                                 returnKeyType="next"
                                 placeholder='Code'
-                            >
-                                
-                            </TextInput>
+                            ></TextInput>
                             <TextInput 
                                 style={[styles.data, styles.dataLast, {width: '35%'}]}
                                 value={formData.phone_number}
@@ -278,14 +222,12 @@ export default function Profile() {
                 <PlatformPressable style={styles.editBtn} onPress={save}>
                     <Text style={[styles.editBtnText, {textAlign: 'center'}]}>Save changes</Text>
                 </PlatformPressable>
-            )
-            : (
+            ): (
                 <PlatformPressable style={styles.editBtn} onPress={edit}>
                     <Text style={styles.editBtnText}>Edit</Text>
                     <FontAwesome style={styles.editIcon} name="edit" color="black" />
                 </PlatformPressable>
-            )
-            }
+            )}
             {messageVisible && (
                 <Text style={[authStyles.subtitle, {color: colors.themeColor}]}>Data saved successfully!</Text>
             )}
@@ -352,17 +294,5 @@ const createStyles = (editing: boolean) => StyleSheet.create({
         fontSize: 20,
         color: '#fff',
         top: 13
-    },
-    subscription: {
-        width: 250,
-        padding: 20,
-        marginBottom: 30,
-        borderRadius: 10,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.3,
-        shadowRadius: 4.5,
-        elevation: 5,
-        minHeight: 100
     }
 })

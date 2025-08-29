@@ -19,7 +19,6 @@ export const authStyles = StyleSheet.create({
     backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
-
   },
   text: {
     color: colors.textColor,
@@ -34,7 +33,8 @@ export const authStyles = StyleSheet.create({
   form: {
     alignItems: 'center',
     position: 'relative',
-    top: -50
+    top: -50,
+    maxWidth: 400
   },
   title: {
     color: '#000',
@@ -78,6 +78,16 @@ export const authStyles = StyleSheet.create({
     position: 'relative',
     fontSize: 20,
     top: 20
+  },
+  checkboxArea: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 10,
+    marginTop: 20,
+    marginBottom: -10
+  },
+  checkbox: {
+    marginRight: 10
   }
 });
 
