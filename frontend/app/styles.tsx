@@ -102,3 +102,56 @@ export const styles = StyleSheet.create({
     color: colors.textColor,
   },
 });
+
+export const createTableStyles = (editing: boolean) => StyleSheet.create({
+    dataContainer: {
+        width: 400,
+        borderWidth: 2,
+        borderRadius: 10,
+        borderColor: editing ? 'black' : colors.themeColor,
+        backgroundColor: editing ? '#ddd' : '#fff'
+    },
+    row: {
+        width: '100%',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        borderTopWidth: 2
+    },
+    rowFirst: {
+        borderTopWidth: 0
+    },
+    dataName: {
+        width: '50%',
+        borderRightWidth: 2,
+        padding: 10
+    },
+    data: {
+        width: '50%',
+        padding: 10,
+        backgroundColor: '#fff',
+        borderLeftWidth: editing ? 2 : 0
+    },
+    dataFirst: {
+        borderStartEndRadius: 10
+    },
+    dataLast: {
+        borderEndEndRadius: 10,
+    },
+    button: {
+        width: 100,
+        position: 'relative',
+        top: 20,
+        height: 50,
+        backgroundColor: colors.themeColor,
+        alignContent: 'center',
+        justifyContent: 'center',
+        borderRadius: 10,
+        left: 150,
+        padding: 20
+    },
+    buttonText: {
+        textAlign: 'left',
+        color: '#fff',
+        fontWeight: 'bold'
+    },
+})
