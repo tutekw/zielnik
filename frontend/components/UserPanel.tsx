@@ -1,10 +1,9 @@
-import { Button, PlatformPressable } from '@react-navigation/elements';
+import { PlatformPressable } from '@react-navigation/elements';
 import { View, Text, StyleSheet, Pressable, TouchableOpacity} from 'react-native'
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { BlurView } from 'expo-blur';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -12,10 +11,12 @@ import Animated, {
   Easing,
   runOnJS,
 } from 'react-native-reanimated';
-import * as Updates from 'expo-updates';
+
 import { colors } from '@/app/styles';
 import storage from '../app/storage';
 import dataHandler from '@/app/dataHandler';
+import * as Updates from 'expo-updates';
+
 export function UserPanel () {
     const router = useRouter();
 
@@ -24,9 +25,11 @@ export function UserPanel () {
     }, []);
 
     const [loggedIn, setLoggedIn] = useState<boolean>(false);
-    const [userMail, setUserMail] = useState<string>();
+    const [user, setUser] = useState<any>(undefined);
     const expanded = useSharedValue(0); // 0 = zamknięte, 1 = otwarte
     const [visible, setVisible] = useState(false);
+
+    const styles = createStyles(user);
 
     async function reload() {
         if (__DEV__) {
@@ -40,7 +43,7 @@ export function UserPanel () {
         try {
             const user = await dataHandler.getUser();
             if(user) {
-                setUserMail(user.mail)
+                setUser(user)
                 setLoggedIn(true);
                 return;
             }
@@ -110,7 +113,8 @@ export function UserPanel () {
                     <>
                         <Animated.View style={[styles.menu, animatedMenuStyle]}>
                             <View style={styles.menuTitle}>
-                                <Text style={styles.userMail}>{userMail}</Text>
+                                <Text style={styles.userMail}>{user.mail}</Text>
+                                <Text style={styles.subscription}>{user.subscription ? (user.subscription.subscription_type ? "Premium account" : "Free account") : "Free account"}</Text>
                             </View>
                             <TouchableOpacity onPress={() => router.navigate('/profile')} style={[styles.menuItem, styles.menuItemFirst]}>
                                 <Text>Profile</Text>
@@ -119,6 +123,7 @@ export function UserPanel () {
                             <TouchableOpacity onPress={() => router.navigate('/subscription')} style={styles.menuItem}>
                                 <Text>Subscription</Text>
                                 <FontAwesome style={styles.menuIcon} name="external-link" color="black" />
+                                {/* domyslnie niech tak wyglada jak user nie ma subskrypcji albo ma darmową, jak nie ma to wtedy jakis przycisk Choose */}
                             </TouchableOpacity>
                             <TouchableOpacity onPress={logOut} style={[styles.menuItem, styles.menuItemLast]}>
                                 <Text>Log out</Text>
@@ -137,7 +142,7 @@ export function UserPanel () {
     )
 }
 
-const styles = StyleSheet.create({
+const createStyles = (user? :any) => StyleSheet.create({
     loginBtn: {
         justifyContent: 'center',
         alignContent: 'center',
@@ -157,19 +162,20 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 40,
         width: 250,
-        height: 185,
+        minHeight: 235,
         right: 5,
         borderWidth: 2,
         borderRadius: 10,
         borderColor: colors.themeColor,
         padding: 10,
+        paddingBottom: 0,
         alignItems: 'center',
         backgroundColor: '#fff'
     },
     menuTitle: {
         marginTop: -10,
         borderTopWidth: 0,
-        height: 60,
+        height: 110,
         textAlignVertical: 'center',
         justifyContent: 'center',
     },
@@ -178,7 +184,13 @@ const styles = StyleSheet.create({
         fontSize: 20,
         wordWrap: 'break-word',
         width: 250,
-        textAlign: 'center'
+        textAlign: 'center',
+        marginBottom: 20
+    },
+    subscription: {
+        textAlign: 'center',
+        fontSize: 18,
+        color: (user && user.subscription) ? (user.subscription.subscription_type ? colors.themeColor : '#000') : '#000'
     },
     menuItem: {
         height: 40,

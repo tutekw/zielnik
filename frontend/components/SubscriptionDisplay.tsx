@@ -1,7 +1,8 @@
+import { colors } from '@/app/styles';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Text, View, StyleSheet} from 'react-native';
 
-export default function SubscriptionDisplay ({sub, displayBenefits = false}: {sub: any, displayBenefits? :boolean}) {
+export default function SubscriptionDisplay ({sub, displayBenefits = false, displayUpgrade = false}: {sub: any, displayBenefits? :boolean, displayUpgrade? :boolean}) {
     const styles = createStyles(displayBenefits);
     if (!sub || sub.subscription_type == 0) {
         return (
@@ -9,6 +10,9 @@ export default function SubscriptionDisplay ({sub, displayBenefits = false}: {su
                 <Text style={styles.subscriptionTitle}>Free subscription</Text>
                 {displayBenefits && (
                     <Text style={{textAlign: 'center'}}>Basic functionalities</Text>
+                )}
+                {displayUpgrade && (
+                    <Text style={{textAlign: 'center', color: colors.themeColor, textDecorationLine: 'underline'}}>Upgrade now!</Text>
                 )}
             </View>
         );

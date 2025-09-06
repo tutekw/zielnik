@@ -5,27 +5,25 @@ import HomeButton from '@/components/HomeButton';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'expo-router';
 import axios from 'axios';
-import { authStyles, colors  } from './styles';
+import { authStyles, colors, createTableStyles  } from './styles';
 import handleResponseError from './responseErrorHandler';
 import { LinearGradient } from 'expo-linear-gradient';
 import storage from './storage';
 import dataHandler from './dataHandler';
 import SubscriptionDisplay from '@/components/SubscriptionDisplay';
+import AddressDisplay from '@/components/AddressDisplay';
 
 export default function Profile() {
   
     const router = useRouter();
 
     useEffect(() => {
-            fetchData();
-        }, []);
+        fetchData();
+    }, []);
 
     const [user, setUser] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [editing, setEdit] = useState<boolean>(false);
-
-    //const [phoneCode, setPhoneCode] = useState<string>('');
-    // const [pickerVisible, setPickerVisibility] = useState<boolean>(false);
 
     const nameRef = useRef(null);
     const surnameRef = useRef(null);
@@ -39,18 +37,16 @@ export default function Profile() {
     // const cityRef = useRef(null);
     // const countryRef = useRef(null);
 
-    const styles = createStyles(editing);
+    const tableStyles = createTableStyles(editing);
 
     const [errorMessage, setErrorMessage] = useState('');
     const [messageVisible, setMessageVisible] = useState<boolean>(false)
 
     const [formData, setFormData] = useState({name: '', surname: '', phone_code: '', phone_number: ''});
-    //street: '', street_number: '', house_number: null, postcode: '', city: '', country: ''
 
     function handleChange(field: 'name' | 'surname' | 'phone_code' | 'phone_number', value: string|undefined) {
         setFormData((prev) => ({ ...prev, [field]: value }));
     }
-    // | 'street' | 'street_number' | 'house_number' | 'postcode' | 'city' | 'country'
 
     const fetchData = async () => {
         try {
@@ -70,6 +66,7 @@ export default function Profile() {
             phone_code: user.phone_code,
             phone_number: user.phone_number
         });
+        setMessageVisible(false);
         setEdit(true);
     }
 
@@ -122,65 +119,69 @@ export default function Profile() {
             <Text style={authStyles.title}>User profile</Text>
             <Text style={authStyles.subtitle}>{user.mail}</Text>
 
+            {/* subscription display */}
             {!editing && 
                 <TouchableOpacity onPress={()=> router.navigate('/subscription')}>
-                    <SubscriptionDisplay sub={user.subscription} />
+                    <SubscriptionDisplay sub={user.subscription} displayUpgrade={true}/>
                 </TouchableOpacity>
-            }
+            } 
+            
+
             {editing && <Text style={[authStyles.title, {textAlign: 'left', marginBottom: 10}]}>Editing</Text>}
 
-            <View style={styles.dataContainer}>
-                <View style={[styles.row, styles.rowFirst]}>
-                    <View style={styles.dataName}>
+
+            <View style={tableStyles.dataContainer}>
+                <View style={[tableStyles.row, tableStyles.rowFirst]}>
+                    <View style={tableStyles.dataName}>
                         <Text>First name:</Text>
                     </View>
                     {editing ? (
                         <TextInput 
-                        style={[styles.data, styles.dataFirst]}
-                        value={formData.name}
-                        ref={nameRef} 
-                        onChangeText={(text) => handleChange('name', text)} 
-                        onSubmitEditing={() => surnameRef.current?.focus()} 
-                        id='name'
-                        returnKeyType="next"
-                        placeholder='Name'
+                            style={[tableStyles.data, tableStyles.dataFirst]}
+                            value={formData.name}
+                            ref={nameRef} 
+                            onChangeText={(text) => handleChange('name', text)} 
+                            onSubmitEditing={() => surnameRef.current?.focus()} 
+                            id='name'
+                            returnKeyType="next"
+                            placeholder='Name'
                         ></TextInput>
                     ): (
-                        <View style={[styles.data, styles.dataFirst]}>
+                        <View style={[tableStyles.data, tableStyles.dataFirst]}>
                             <Text>{user.name}</Text>
                         </View>
                     )}
                 </View>
-                <View style={styles.row}>
-                    <View style={styles.dataName}>
+                <View style={tableStyles.row}>
+                    <View style={tableStyles.dataName}>
                         <Text>Last name:</Text>
                     </View>
                     {editing ? (
                         <TextInput 
-                        style={styles.data}
-                        value={formData.surname}
-                        ref={surnameRef} 
-                        onChangeText={(text) => handleChange('surname', text)} 
-                        onSubmitEditing={() => codeRef.current?.focus()} 
-                        id='surname'
-                        returnKeyType="next"
-                        placeholder='Surname'
+                            style={tableStyles.data}
+                            value={formData.surname}
+                            ref={surnameRef} 
+                            onChangeText={(text) => handleChange('surname', text)} 
+                            onSubmitEditing={() => codeRef.current?.focus()} 
+                            id='surname'
+                            returnKeyType="next"
+                            placeholder='Surname'
                         ></TextInput>
                     ): (
-                        <View style={styles.data}>
+                        <View style={tableStyles.data}>
                             <Text>{user.surname}</Text>
                         </View>
                     )}
                 </View>
-                <View style={styles.row}>
-                    <View style={styles.dataName}>
+                <View style={tableStyles.row}>
+                    <View style={tableStyles.dataName}>
                         <Text>Phone number:</Text>
                     </View>
                     {editing ? (
                         <>
-                            <Text style={[styles.data, {width: '5%'}]}>+</Text>
+                            <Text style={[tableStyles.data, {width: '5%'}]}>+</Text>
                             <TextInput
-                                style={[styles.data, {width: '10%'}]}
+                                style={[tableStyles.data, {width: '10%', borderLeftWidth: 0}]}
                                 //onPress={() => setPickerVisibility(true)}
                                 value={formData.phone_code}
                                 ref={codeRef} 
@@ -191,7 +192,7 @@ export default function Profile() {
                                 placeholder='Code'
                             ></TextInput>
                             <TextInput 
-                                style={[styles.data, styles.dataLast, {width: '35%'}]}
+                                style={[tableStyles.data, tableStyles.dataLast, {width: '35%'}]}
                                 value={formData.phone_number}
                                 ref={phoneRef} 
                                 onChangeText={(text) => handleChange('phone_number', text)} 
@@ -202,97 +203,49 @@ export default function Profile() {
                             ></TextInput>
                         </>
                     ): (
-                        <View style={[styles.data, styles.dataLast]}>
+                        <View style={[tableStyles.data, tableStyles.dataLast]}>
                             <Text>+{user.phone_code} {user.phone_number}</Text>
                         </View>
                     )}
                 </View>
-                {/* <View style={styles.row}>
-                    <View style={styles.dataName}>
-                        <Text>Address:</Text>
-                    </View>
-                    <View style={[styles.data, styles.dataLast]}>
-                        <Text style={{flexWrap: 'wrap'}}>{user.address.street} {user.address.street_number} {user.address.house_number && '\nflat '.concat(user.address.house_number)}</Text>
-                        <Text style={{flexWrap: 'wrap'}}>{user.address.postcode} {user.address.city}</Text>
-                        <Text style={{flexWrap: 'wrap'}}>{user.address.country}</Text>
-                    </View>
-                </View> */}
             </View>
             {editing ? (
-                <PlatformPressable style={styles.editBtn} onPress={save}>
-                    <Text style={[styles.editBtnText, {textAlign: 'center'}]}>Save changes</Text>
+                <PlatformPressable style={tableStyles.button} onPress={save}>
+                    <Text style={[tableStyles.buttonText, {textAlign: 'center'}]}>Save changes</Text>
                 </PlatformPressable>
             ): (
-                <PlatformPressable style={styles.editBtn} onPress={edit}>
-                    <Text style={styles.editBtnText}>Edit</Text>
+                <PlatformPressable style={tableStyles.button} onPress={edit}>
+                    <Text style={tableStyles.buttonText}>Edit</Text>
                     <FontAwesome style={styles.editIcon} name="edit" color="black" />
                 </PlatformPressable>
             )}
             {messageVisible && (
                 <Text style={[authStyles.subtitle, {color: colors.themeColor}]}>Data saved successfully!</Text>
             )}
+            <View style={styles.addressContainer}>
+                <Text style={styles.addressTitle}>Billing address</Text>
+                <AddressDisplay address={user.address}></AddressDisplay>
+            </View>
             <HomeButton />
         </View>
     );
 }
 
-const createStyles = (editing: boolean) => StyleSheet.create({
-    dataContainer: {
-        minWidth: 400,
-        maxWidth: 400,
-        borderWidth: 2,
-        borderRadius: 10,
-        borderColor: editing ? 'black' : colors.themeColor,
-        backgroundColor: editing ? '#ddd' : '#fff'
-    },
-    row: {
-        width: '100%',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        borderTopWidth: 2
-    },
-    rowFirst: {
-        borderTopWidth: 0
-    },
-    dataName: {
-        width: '50%',
-        borderRightWidth: 2,
-        padding: 10
-    },
-    data: {
-        width: '50%',
-        padding: 10,
-        backgroundColor: '#fff',
-        borderLeftWidth: editing ? 2 : 0
-    },
-    dataFirst: {
-        borderStartEndRadius: 10
-    },
-    dataLast: {
-        borderEndEndRadius: 10,
-    },
-    editBtn: {
-        width: 100,
-        position: 'relative',
-        top: 20,
-        height: 50,
-        backgroundColor: colors.themeColor,
-        alignContent: 'center',
-        justifyContent: 'center',
-        borderRadius: 10,
-        left: 150,
-        padding: 20
-    },
-    editBtnText: {
-        textAlign: 'left',
-        color: '#fff',
-        fontWeight: 'bold'
-    },
+const styles = StyleSheet.create({
     editIcon: {
         position: 'absolute',
         right: 10,
         fontSize: 20,
         color: '#fff',
         top: 13
+    },
+    addressContainer: {
+        marginTop: 40,
+        alignContent: 'center',
+    },
+    addressTitle: {
+        textAlign: 'center',
+        fontSize: 20,
+        marginBottom: 10,
     }
 })

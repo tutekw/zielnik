@@ -24,6 +24,7 @@ router.get('/', async (req, res) => {
     const subscription = await queries.getSubscriptionById(tokenUser.subscription_id);
 
     res.status(200).json({
+        id: tokenUser.id,
         name: tokenUser.name,
         surname: tokenUser.surname,
         mail: tokenUser.mail,
@@ -57,11 +58,12 @@ router.get('/:mail', async (req, res) => {
     const subscription = await queries.getSubscriptionById(user.subscription_id);
 
     res.json({
-        name: user.name,
-        surname: user.surname,
-        mail: user.mail,
-        phone_code: user.phone_code,
-        phone_number: user.phone_number,
+        id: tokenUser.id,
+        name: tokenUser.name,
+        surname: tokenUser.surname,
+        mail: tokenUser.mail,
+        phone_code: tokenUser.phone_code,
+        phone_number: tokenUser.phone_number,
         address: address,
         subscription: subscription
     });
@@ -74,7 +76,7 @@ router.post('/update', async (req, res) => {
             message: "Unauthorized"
         });
         return;
-    }
+    } //that statement is probably useless because of previous JWT authentication
 
     const tokenUser = await authQueries.getUserByToken(token);
     if(!tokenUser) {
@@ -90,5 +92,43 @@ router.post('/update', async (req, res) => {
     });
     return;
 });
+
+router.post('/subscription', async (req,res) => {
+    const token = req.headers.authorization;
+    const tokenUser = await authQueries.getUserByToken(token);
+
+    if(tokenUser.subscription_id == null) {
+        await queries.addSubscription(tokenUser.id, req.body.subscription_type);
+        return res.status(200).json({});
+    }
+    //if user changes their subscription
+
+    //payment validation system
+    const update = await queries.updateSubscription(tokenUser.subscription_id, req.body.subscription_type);
+    if(!update) {
+        return res.status(400).json({
+            message: 'User already has this type of subscription',
+        })
+    }
+    return res.status(200).json({});
+    
+});
+
+router.post('/address', async (req,res) => {
+    const token = req.headers.authorization;
+    console.log(token);
+    const tokenUser = await authQueries.getUserByToken(token);
+    console.log(tokenUser);
+    console.log(tokenUser.address_id);
+
+    if(tokenUser.address_id == null) {
+        console.log("BEZ ADRESU")
+        await queries.addUserAddress(tokenUser.id, req.body);
+        return res.status(200).json({})
+    }
+
+    await queries.updateUserAddress(tokenUser.address_id, req.body);
+    return res.status(200).json({})
+})
 
 module.exports = router;
