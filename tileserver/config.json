@@ -1,0 +1,30 @@
+{
+  "options": {
+        "paths": {
+            "root": "/data"
+        }
+    },
+    "data": {
+        "poland": {
+            "mbtiles": "osm-2020-02-10-v3.11_europe_poland.mbtiles"
+        }
+    },
+    "styles": {
+        "test": {
+            "style": "poland-style.json",
+            "sources": {
+                "openmaptiles": {
+                    "url": "mbtiles://{poland}"
+                }
+            }
+        },
+        "basic": {
+            "style": "https://api.maptiler.com/maps/basic-v2/style.json?key=Rt08tJ8u46HacvIuk3dm",
+            "sources": {
+                "openmaptiles": {
+                    "url": "mbtiles://{poland}"
+                }
+            }
+        }
+    }
+}

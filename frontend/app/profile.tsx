@@ -158,22 +158,25 @@ export default function Profile() {
                     </View>
                     {editing ? (
                         <TextInput 
-                            style={tableStyles.data}
+                            style={[tableStyles.data, tableStyles.dataLast]}
                             value={formData.surname}
                             ref={surnameRef} 
                             onChangeText={(text) => handleChange('surname', text)} 
-                            onSubmitEditing={() => codeRef.current?.focus()} 
+                            // onSubmitEditing={() => codeRef.current?.focus()} Shift to phone number input
+                            onSubmitEditing={save}
                             id='surname'
-                            returnKeyType="next"
+                            // returnKeyType="next"
+                            returnKeyType="done"
                             placeholder='Surname'
                         ></TextInput>
                     ): (
-                        <View style={tableStyles.data}>
+                        <View style={[tableStyles.data, tableStyles.dataLast]}>
                             <Text>{user.surname}</Text>
                         </View>
                     )}
                 </View>
-                <View style={tableStyles.row}>
+                {/* Phone number */}
+                {/* <View style={tableStyles.row}>
                     <View style={tableStyles.dataName}>
                         <Text>Phone number:</Text>
                     </View>
@@ -207,7 +210,7 @@ export default function Profile() {
                             <Text>+{user.phone_code} {user.phone_number}</Text>
                         </View>
                     )}
-                </View>
+                </View> */}
             </View>
             {editing ? (
                 <PlatformPressable style={tableStyles.button} onPress={save}>

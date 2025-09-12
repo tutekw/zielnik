@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Text, View, StyleSheet } from 'react-native';
 import axios from 'axios'
 import storage from '../storage';
+import MapDisplayWeb from '@/components/MapDisplayWeb';
   
 
 export default function MapScreen() {
@@ -24,12 +25,23 @@ export default function MapScreen() {
 			console.error("Error during fetching locations: ", err);
 		}
 	};
+	
+	if(locations.length >0) {
+		return  (
+			<View style={styles.container}>
+				<MapDisplayWeb locations={locations}></MapDisplayWeb>
+				{/* <Text style={styles.text}>{locations.length > 0 ? (JSON.stringify(locations)) : "Loading..."}</Text> */}
+			</View>
+		);
+	}
 
-	return  (
+	return (
 		<View style={styles.container}>
-			<Text style={styles.text}>{locations.length > 0 ? (JSON.stringify(locations)) : "Loading..."}</Text>
+			<Text style={{color: "#fff"}}>Loading...</Text>
 		</View>
-	);
+	)
+	
+	
 }
 
 const styles = StyleSheet.create({
