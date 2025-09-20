@@ -6,7 +6,7 @@ import { useRef, useState } from 'react';
 import { Text, View, StyleSheet, TextInput, Alert } from 'react-native';
 import { authStyles} from './styles';
 import axios from 'axios';
-import handleResponseError from './responseErrorHandler';
+import handleResponseError from '../utils/responseErrorHandler';
 
 export default function Signup() {
 
@@ -45,7 +45,7 @@ export default function Signup() {
 
     (async ()=>{
       try {
-        const response = await axios.post('http://localhost:5050/api/auth/signup', {
+        const response = await axios.post(process.env.EXPO_PUBLIC_API_URL + 'auth/signup', {
           mail: formData.email,
           password: formData.password,
         });

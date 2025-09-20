@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Text, View, StyleSheet } from 'react-native';
 import axios from 'axios'
-import storage from '../storage';
+import storage from '../../utils/storage';
 import MapDisplayWeb from '@/components/MapDisplayWeb';
-  
 
 export default function MapScreen() {
 	useEffect(() => {
@@ -15,12 +14,11 @@ export default function MapScreen() {
 	const fetchData = async () => {
 		try {
 			const token = await storage.getValue("token");
-			const response = await axios.get("http://localhost:5050/api/location/", 
+			const response = await axios.get(process.env.EXPO_PUBLIC_API_URL +"location/", 
 			{
 				headers: token ? { Authorization: `Bearer ${token}` } : {},
 			});
 			setLocationData(response.data);
-			console.log(response.data[0]?.name);
 		} catch (err) {
 			console.error("Error during fetching locations: ", err);
 		}

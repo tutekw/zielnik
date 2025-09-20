@@ -5,7 +5,7 @@ import { PlatformPressable } from '@react-navigation/elements';
 import { useState } from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import axios from 'axios';
-import handleResponseError from './responseErrorHandler';
+import handleResponseError from '../utils/responseErrorHandler';
 import HomeButton from '@/components/HomeButton';
 
 export default function Activate () {
@@ -29,7 +29,7 @@ export default function Activate () {
         }
         (async ()=>{
             try {
-                const response = await axios.post('http://localhost:5050/api/auth/activate', {
+                const response = await axios.post(process.env.EXPO_PUBLIC_API_URL+ 'auth/activate', {
                     code: code,
                 });
                 if (response.status == 200) {

@@ -5,7 +5,7 @@ import { PlatformPressable } from '@react-navigation/elements';
 import axios from 'axios';
 import HomeButton from '@/components/HomeButton';
 import { Link } from 'expo-router';
-import handleResponseError from './responseErrorHandler';
+import handleResponseError from '../utils/responseErrorHandler';
 
 export default function Reset() {
   const styles = authStyles;
@@ -42,7 +42,7 @@ export default function Reset() {
     }
     (async ()=>{
       try {
-          const response = await axios.post('http://localhost:5050/api/auth/reset', {
+          const response = await axios.post(process.env.EXPO_PUBLIC_API_URL + 'auth/reset', {
               code: formData.code,
               password: formData.password
           });

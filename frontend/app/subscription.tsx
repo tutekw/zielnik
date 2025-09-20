@@ -1,7 +1,7 @@
 import { Text, View, StyleSheet, TouchableOpacity } from 'react-native';
 import { authStyles } from './styles';
-import storage from './storage';
-import dataHandler from './dataHandler';
+import storage from '@/utils/storage';
+import dataHandler from '@/utils/dataHandler';
 import { useEffect, useState } from 'react';
 import { Link, useRouter } from 'expo-router';
 import SubscriptionDisplay from '@/components/SubscriptionDisplay';
@@ -64,7 +64,7 @@ export default function Subscriptions() {
 			}
 
 			try {
-				const response = await axios.post('http://localhost:5050/api/user/subscription', {
+				const response = await axios.post(process.env.EXPO_PUBLIC_API_URL + 'user/subscription', {
                     subscription_type: subscription_type
                 },
                 {

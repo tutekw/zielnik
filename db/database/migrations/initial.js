@@ -36,8 +36,8 @@ exports.up = async (knex) => {
         stringTable(table, 'type').notNullable();
         table.float('latitude').notNullable();
         table.float('longitude').notNullable();
-        table.datetime('collectionStart', {useTz: false});
-		table.datetime('collectionEnd', {useTz: false});
+        table.integer('collectionStartMonth');
+		table.integer('collectionEndMonth');
 		table.integer('access'); //0-public, 1-private
 		references(table, tableNames.userList, 'user_id', false);
     })

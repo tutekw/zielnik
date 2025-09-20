@@ -5,6 +5,7 @@ const {rateLimit} = require('express-rate-limit')
 const user = require('./user/user.routes')
 const location = require('./location/location.routes')
 const auth = require('./auth/auth.routes')
+const icon = require('./icon/icon.routes')
 
 const limiter = rateLimit({
     limit: 100,
@@ -18,6 +19,7 @@ const limiter = rateLimit({
 router.use('/user', limiter, user);
 router.use('/location', limiter, location);
 router.use('/auth', auth);
+router.use('/icon', limiter, icon)
 
 router.get('/', (req, res) => {
 	res.json({

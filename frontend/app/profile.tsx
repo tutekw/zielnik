@@ -1,15 +1,14 @@
 import { PlatformPressable } from '@react-navigation/elements';
-import { Text, View, StyleSheet, TextInput, Button, Pressable, Platform, TextBase, TouchableOpacity } from 'react-native';
+import { Text, View, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import HomeButton from '@/components/HomeButton';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'expo-router';
 import axios from 'axios';
 import { authStyles, colors, createTableStyles  } from './styles';
-import handleResponseError from './responseErrorHandler';
-import { LinearGradient } from 'expo-linear-gradient';
-import storage from './storage';
-import dataHandler from './dataHandler';
+import handleResponseError from '../utils/responseErrorHandler';
+import storage from '@/utils/storage';
+import dataHandler from '@/utils/dataHandler';
 import SubscriptionDisplay from '@/components/SubscriptionDisplay';
 import AddressDisplay from '@/components/AddressDisplay';
 
@@ -79,7 +78,7 @@ export default function Profile() {
             }
 
             try {
-                const response = await axios.post('http://localhost:5050/api/user/update', {
+                const response = await axios.post(process.env.EXPO_PUBLIC_API_URL + 'user/update', {
                     name: formData.name,
                     surname: formData.surname,
                     phone_code: formData.phone_code,

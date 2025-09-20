@@ -5,7 +5,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Link, useRouter } from 'expo-router';
 import { useState } from 'react';
 import axios from 'axios';
-import handleResponseError from './responseErrorHandler';
+import handleResponseError from '../utils/responseErrorHandler';
 import HomeButton from '@/components/HomeButton';
 
 export default function Forgot() {
@@ -28,7 +28,7 @@ export default function Forgot() {
         }
         (async ()=>{
             try {
-                const response = await axios.post('http://localhost:5050/api/auth/forgot', {
+                const response = await axios.post(process.env.EXPO_PUBLIC_API_URL + 'auth/forgot', {
                     mail: mail,
                 });
                 if (response.status == 200) {

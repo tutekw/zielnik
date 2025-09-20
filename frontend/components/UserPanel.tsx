@@ -13,8 +13,8 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { colors } from '@/app/styles';
-import storage from '../app/storage';
-import dataHandler from '@/app/dataHandler';
+import storage from '@/utils/storage';
+import dataHandler from '@/utils/dataHandler';
 import * as Updates from 'expo-updates';
 
 export function UserPanel () {
@@ -84,7 +84,7 @@ export function UserPanel () {
                     return
                 }
                 const token = await storage.getValue("token");
-                await axios.put("http://localhost:5050/api/auth/signout", null,
+                await axios.put(process.env.EXPO_PUBLIC_API_URL + "auth/signout", null,
                 {
                     headers: { Authorization: `Bearer ${token}` }
                 });

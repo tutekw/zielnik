@@ -55,7 +55,8 @@ export const authStyles = StyleSheet.create({
     minWidth: 100,
     marginTop: 8,
     minHeight: 25,
-    padding: 5
+    padding: 5,
+    color: '#000'
   },
   errorMessage: {
     color: 'red',

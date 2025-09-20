@@ -1,4 +1,4 @@
-import storage from './storage';
+import storage from '../utils/storage';
 import axios from 'axios';
 
 async function getUser() {
@@ -15,7 +15,7 @@ async function getUser() {
     }
 
     try{
-        const response = await axios.post("http://localhost:5050/api/auth/token", null,
+        const response = await axios.post(process.env.EXPO_PUBLIC_API_URL + "auth/token", null,
         {
             headers: { Authorization: `Bearer ${token}` }
         });
@@ -32,7 +32,7 @@ async function getUser() {
     }
 
     try {
-        const response = await axios.get("http://localhost:5050/api/user/",
+        const response = await axios.get(process.env.EXPO_PUBLIC_API_URL + "user/",
         {
             headers: { Authorization: `Bearer ${token}` }
         });
