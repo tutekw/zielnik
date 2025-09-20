@@ -167,15 +167,14 @@ router.post('/reset', codeLimiter, async (req,res) => {
 })
 
 router.post('/token', async (req,res) => {
-	// const tokenValid = await queries.checkTokenValidity(req.headers.authorization);
-	// if(tokenValid) {
-	// 	return res.status(200).json({});
-	// }
-	// return res.status(400).json({
-	// 	message: 'invalid token'
-	// });
+	const tokenValid = await queries.checkTokenValidity(req.headers.authorization);
+	if(tokenValid) {
+		return res.status(200).json({});
+	}
+	return res.status(400).json({
+		message: 'invalid token'
+	});
 
-	//jeżeli ŕequest tutaj dotarł , to znaczy że przeszedł przez autentykację JWT -> token działa
 	return res.status(200).json({});
 })
 

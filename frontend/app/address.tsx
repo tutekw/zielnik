@@ -1,13 +1,13 @@
 import { Text, View, StyleSheet, TextInput } from 'react-native';
 import {colors, authStyles, createTableStyles} from '@/app/styles'
 import { useEffect, useRef, useState } from 'react';
-import dataHandler from './dataHandler';
-import storage from './storage';
+import dataHandler from '@/utils/dataHandler';
+import storage from '@/utils/storage';
 import { Link, useRouter } from 'expo-router';
 import { PlatformPressable } from '@react-navigation/elements';
 import HomeButton from '@/components/HomeButton';
 import axios from 'axios';
-import handleResponseError from './responseErrorHandler';
+import handleResponseError from '../utils/responseErrorHandler';
 
 export default function Address() {
 
@@ -73,7 +73,7 @@ export default function Address() {
                 return;
             }
             try {
-                const response = await axios.post('http://localhost:5050/api/user/address', {
+                const response = await axios.post(process.env.EXPO_PUBLIC_API_URL + 'user/address', {
                     street: formData.street,
                     street_number: formData.street_number,
                     house_number: (formData.house_number ? formData.house_number : null),

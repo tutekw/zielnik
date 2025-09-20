@@ -6,10 +6,10 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useRouter } from 'expo-router';
 import axios from 'axios';
 import { authStyles, colors } from './styles';
-import handleResponseError from './responseErrorHandler';
-import storage from './storage';
+import handleResponseError from '../utils/responseErrorHandler';
+import storage from '@/utils/storage';
 import Checkbox from 'expo-checkbox';
-import dataHandler from './dataHandler';
+import dataHandler from '@/utils/dataHandler';
 
 export default function Login() {
 	useEffect(() => {
@@ -42,7 +42,7 @@ export default function Login() {
 		var token = await storage.getValue("token");
 		if(token) {
 			try {
-				const response = await axios.get("http://localhost:5050/api/user/", 
+				const response = await axios.get(process.env.EXPO_PUBLIC_API_URL + 'user/', 
 					{
 						headers: { Authorization: `Bearer ${token}` }
 					});
@@ -76,7 +76,7 @@ export default function Login() {
 		}
 		(async ()=>{
 			try {
-				const response = await axios.post('http://localhost:5050/api/auth/signin', {
+				const response = await axios.post(process.env.EXPO_PUBLIC_API_URL + 'auth/signin', {
 					mail: formData.email,
 					password: formData.password,
 					remember_me: rememberMe,

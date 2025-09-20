@@ -23,10 +23,11 @@ function checkPublicEndpoints(url){
         '/api/auth/forgot',
         '/api/auth/reset',
         '/api/location/',
+        '/api/icon/'
     ]
     let isPublic = false;
     accessibleRoutes.forEach((element) => {
-        if(url == element){
+        if(url.startsWith(element)) {
             isPublic = true;
         }
     })

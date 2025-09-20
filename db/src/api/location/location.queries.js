@@ -12,11 +12,11 @@ async function get(userId) {
 	const data = await db(tableNames.locationList).where({access: 0}).orWhere({user_id: userId});
 	return data; 
 }
-async function getLocationByCoordinates(latitude, longtitude) {
+async function getLocationByCoordinates(longtitude, latitude) {
 	const location = await db(tableNames.locationList)
 	.where({
+		longtitude: longtitude,
 		latitude: latitude,
-		longtitude: longtitude
 	})
 	.first();
 	return location;
