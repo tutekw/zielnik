@@ -92,7 +92,6 @@ export default function LocationWindow({ visible, onClose, onSave, coordinates }
         if(!selectedType) {
             return setErrorMessage('Missing location type');
         }
-        console.log(coordinates);
         (async ()=>{
 			try {
                 const token = await storage.getValue("token");

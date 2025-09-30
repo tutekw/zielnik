@@ -55,7 +55,6 @@ async function addSubscription(userId, subscription_type) {
 		expire_date: date
 	}).returning('id');
 	const subId = inserted.id;
-	console.log(userId);
 
 	await db(tableNames.userList).where({id: userId}).update({subscription_id: subId}); 
 	return;
@@ -77,7 +76,6 @@ async function getUserAddress(addressId) {
 }
 
 async function addUserAddress(userId, address) {
-	console.log(address);
 	const [inserted] = await db(tableNames.userAddressList).insert({
 		country: address.country,
 		postcode: address.postcode,

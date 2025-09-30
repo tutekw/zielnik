@@ -23,7 +23,6 @@ async function getLocationByCoordinates(longitude, latitude) {
 }
 
 async function createLocation(locationData, user_id) {
-	console.log(locationData);
 	await db(tableNames.locationList).insert({
 		name: locationData.name || null,
 		description: locationData.description || null,
