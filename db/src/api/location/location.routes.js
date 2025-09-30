@@ -36,6 +36,7 @@ router.get('/', async (req,res) => {
 });
 
 router.post('/', async (req,res) =>{
+    
     if(!req.headers.authorization) {
         res.status(402).json({
             message: 'To add new locations, you must first purchase a subscription'
@@ -57,14 +58,14 @@ router.post('/', async (req,res) =>{
         return;
     }
     
-    const location = await queries.getLocationByCoordinates(req.body.longtitude, req.body.latitude);
+    const location = await queries.getLocationByCoordinates(req.body.longitude, req.body.latitude);
     if(location) {
         res.status(400).json({
             message: 'location already exists'
         })
     }
     else {
-        await queries.createLocation(req.body);
+        await queries.createLocation(req.body, user.id);
         res.status(200).json({
             message: 'location created'
         })

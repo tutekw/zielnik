@@ -1,20 +1,38 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, TouchableOpacity, Text } from 'react-native';
-import maplibregl, { Map } from "maplibre-gl";
+import maplibregl, { LngLat, Map } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { colors } from '@/app/styles';
 import LocationWindow from './LocationWindow';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 // import * as FileSystem from 'expo-file-system';
 // import { Asset } from 'expo-asset';
+import * as Updates from 'expo-updates';
 
 export default function MapDisplayWeb({ locations } : {locations? :any | undefined}) {
 
+    async function reload() {
+        if (__DEV__) {
+            window.location.reload();
+        } else {
+            await Updates.reloadAsync();
+        }
+    }
+
     const mapContainer = useRef(null);
 
-    const [windowVisible, setWindowVisibility] = useState(false);
+    const [windowVisible, setWindowVisible] = useState(false);
 
-    const toggleWindowVisibility = () => setWindowVisibility(!windowVisible);
+    const showWindow = () => setWindowVisible(true);
+
+    const saveLocation = async () => {
+        setWindowVisible(false);
+        await reload();
+    }
+
+    const closeWindow = async () => {
+        setWindowVisible(false);
+    }
 
     let map :Map;
     const userMarker = new maplibregl.Marker({
@@ -58,6 +76,8 @@ export default function MapDisplayWeb({ locations } : {locations? :any | undefin
                     collectionEndMonth: collectionEndMonth,
                 }, 
     }));
+
+    const coordinatesRef = useRef({ lng: 0, lat: 0 });
         
     function getMarker(type: string) {
         switch(type) {
@@ -112,9 +132,6 @@ export default function MapDisplayWeb({ locations } : {locations? :any | undefin
         });
 
         map.on('load', async () => {
-            // const mushroom = Asset.fromModule(require("@/assets/images/mushroom.png"));
-            // await mushroom.downloadAsync();
-
             const url = process.env.EXPO_PUBLIC_API_URL + 'icon/';
 
             const spriteData = await fetch(url + 'sprite.json').then(r => r.json());
@@ -128,16 +145,15 @@ export default function MapDisplayWeb({ locations } : {locations? :any | undefin
 
             for (const name in spriteData) {
                 if (!map.hasImage(name)) {
-                    console.log(name);
                     const frame = spriteData[name];
                     const canvas = document.createElement('canvas');
                     canvas.width = frame.width;
                     canvas.height = frame.height;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(
-                    spriteImg,
-                    frame.x, frame.y, frame.width, frame.height,
-                    0, 0, frame.width, frame.height
+                        spriteImg,
+                        frame.x, frame.y, frame.width, frame.height,
+                        0, 0, frame.width, frame.height
                     );
                     const img = new Image();
                     img.src = canvas.toDataURL();
@@ -170,18 +186,11 @@ export default function MapDisplayWeb({ locations } : {locations? :any | undefin
                     source: type,
                     layout: {
                         'icon-image': type,
-                        // 'icon-size': ["interpolate", ["linear"], ["zoom"],
-                        //     5, 0.1,
-                        //     10, 0.2,
-                        //     15, 0.4
-                        // ],
                         'icon-size': 0.5,
                         'icon-allow-overlap': true
                     },
                     paint: {
                         'icon-color': markerData.color,
-                        // "icon-halo-color": "#ffffff",
-                        // "icon-halo-width": 5,
                     },
 
                 });
@@ -192,7 +201,6 @@ export default function MapDisplayWeb({ locations } : {locations? :any | undefin
                     userMarker.getElement().style.display = 'none';
 
                     const feature = e.features[0];
-                    //add a popup window showing detailed information about a point
                     new maplibregl.Popup()
                         .setLngLat(e.lngLat)
                         .setHTML(`<div style="text-align: center; font-weight: bold;">${feature.properties.name}</div>
@@ -214,10 +222,6 @@ export default function MapDisplayWeb({ locations } : {locations? :any | undefin
                     
                     e.preventDefault();
                 });
-
-                
-
-                
             }
         });
 
@@ -229,24 +233,58 @@ export default function MapDisplayWeb({ locations } : {locations? :any | undefin
 
             userMarker.setLngLat(e.lngLat).addTo(map);
             userMarker.getElement().style.display = 'block'
+
+            coordinatesRef.current = { lng: e.lngLat.lng, lat: e.lngLat.lat };
+
+            const existingDiv = userMarker.getElement().querySelector('.addButton');
+            if (existingDiv) existingDiv.remove();
+            
+            const addButton = document.createElement('div');
+            addButton.className = 'addButton';
+            addButton.innerHTML = "+";
+
+            addButton.onclick = (e) => {
+                e.stopPropagation();
+                showWindow();
+            }
+
+            addButton.style.cssText = `
+                position: absolute;
+                top: 40px;
+                left: 50%;
+                transform: translateX(-50%);
+                border-radius: 10px;
+                padding: 10px;
+                color: white;
+                border: 2px solid;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+                cursor: pointer;
+                font-size: 40px;
+                white-space: nowrap;
+                text-align: center;
+                width: 30px;
+                height: 30px;
+                line-height: 30px;
+                font-weight: bold;
+            `
+            addButton.style.backgroundColor = colors.themeColor;
+            addButton.style.borderColor = colors.themeColor;
+
+            userMarker.getElement().appendChild(addButton);
+
         })
 
         map.on("error", (e) => {
             console.error("Map error:", e);
         });
         return () => map.remove();
-    });
+    }, []);
 
 
     return (
         <>
             <div style={styles.container} ref={mapContainer}></div>
-            <LocationWindow visible={windowVisible}></LocationWindow>
-            <TouchableOpacity style={styles.addButton} onPress={toggleWindowVisibility}>
-                <Text style={{textAlign: 'center'}}>
-                    <FontAwesome name="plus" size={50} color="#fff" />
-                </Text>
-            </TouchableOpacity>
+            <LocationWindow visible={windowVisible} onClose={closeWindow} onSave={saveLocation} coordinates={coordinatesRef.current}></LocationWindow>
         </>
     )
 }
@@ -260,10 +298,8 @@ const styles = StyleSheet.create({
     },
         addButton: {
         position: 'absolute',
-        bottom: 80,
-        right: 80,
-        width: 80,
-        height: 80,
+        top: 40,
+        alignSelf: 'center',
         borderRadius: 10,
         backgroundColor: colors.themeColor,
         shadowColor: "#000",

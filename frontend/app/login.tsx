@@ -126,7 +126,7 @@ export default function Login() {
 			></TextInput>
 			<TouchableOpacity style={styles.checkboxArea} onPress={toggleRemember}>
 				<Checkbox style={styles.checkbox} value={rememberMe} color={rememberMe ? colors.themeColor : undefined}/>
-				<Text>Remember me</Text>
+				<Text style={styles.checkboxText}>Remember me</Text>
 			</TouchableOpacity>
 			
 			<Text style={styles.errorMessage}>{errorMessage}</Text>

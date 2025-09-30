@@ -11,6 +11,9 @@ export default function handleResponseError(error :any, message400? :string) :st
         else if(status === 429) {
             return('Too many requests. Please try again later.')
         }
+        else if(status === 403) {
+            return('You must be logged in to access this feature.')
+        }
         else {
             return(`Unexpected error (${status}).`);
         }

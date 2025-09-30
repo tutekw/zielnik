@@ -17,7 +17,12 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.anonymous.Zielnik"
+      "package": "com.anonymous.Zielnik",
+      "config": {
+        "googleMaps": {
+          "apiKey": "DUMMY_KEY"
+        }
+      }
     },
     "web": {
       "bundler": "metro",
@@ -35,13 +40,7 @@
           "backgroundColor": "#ffffff"
         }
       ],
-      "@maplibre/maplibre-react-native",
-      [
-        "expo-asset",
-        {
-          "assets": ["./assets/images/mushroom.png"]
-        }
-      ]
+      "@maplibre/maplibre-react-native"
     ],
     "experiments": {
       "typedRoutes": true

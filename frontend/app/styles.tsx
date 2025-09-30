@@ -85,10 +85,14 @@ export const authStyles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: 10,
     marginTop: 20,
-    marginBottom: -10
+    marginBottom: -10,
+    alignItems: 'center'
   },
   checkbox: {
     marginRight: 10
+  },
+  checkboxText: {
+    textAlignVertical: 'center',
   }
 });
 

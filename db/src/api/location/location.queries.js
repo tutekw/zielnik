@@ -12,22 +12,28 @@ async function get(userId) {
 	const data = await db(tableNames.locationList).where({access: 0}).orWhere({user_id: userId});
 	return data; 
 }
-async function getLocationByCoordinates(longtitude, latitude) {
+async function getLocationByCoordinates(longitude, latitude) {
 	const location = await db(tableNames.locationList)
 	.where({
-		longtitude: longtitude,
+		longitude: longitude,
 		latitude: latitude,
 	})
 	.first();
 	return location;
 }
 
-async function createLocation(locationData) {
+async function createLocation(locationData, user_id) {
+	console.log(locationData);
 	await db(tableNames.locationList).insert({
-		name: locationData.name,
+		name: locationData.name || null,
+		description: locationData.description || null,
 		type: locationData.type,
+		longitude: locationData.longitude,
 		latitude: locationData.latitude,
-		longtitude: locationData.longtitude
+		collectionStartMonth: locationData.collectionStartMonth || null,
+		collectionEndMonth: locationData.collectionEndMonth || null,
+		access: locationData.access,
+		user_id: user_id,
 	});
 }
 
