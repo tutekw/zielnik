@@ -22,7 +22,7 @@ function checkPublicEndpoints(url){
         '/api/auth/activate',
         '/api/auth/forgot',
         '/api/auth/reset',
-        '/api/location/',
+        '/api/location',
         '/api/icon/'
     ]
     let isPublic = false;
