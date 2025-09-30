@@ -22,7 +22,6 @@ export default function MapScreen() {
 				headers: token ? { Authorization: `Bearer ${token}` } : {},
 			});
 			setLocationData(response.data);
-			console.log(response.data);
 		} catch (err) {
 			console.error("Error during fetching locations: ", err);
 		}

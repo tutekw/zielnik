@@ -116,13 +116,9 @@ router.post('/subscription', async (req,res) => {
 
 router.post('/address', async (req,res) => {
     const token = req.headers.authorization;
-    console.log(token);
     const tokenUser = await authQueries.getUserByToken(token);
-    console.log(tokenUser);
-    console.log(tokenUser.address_id);
 
     if(tokenUser.address_id == null) {
-        console.log("BEZ ADRESU")
         await queries.addUserAddress(tokenUser.id, req.body);
         return res.status(200).json({})
     }

@@ -78,7 +78,6 @@ export function UserPanel () {
 
     function logOut() {
         (async () => {
-            console.log("LOGOUT");
             try {
                 if(!loggedIn) {
                     return
